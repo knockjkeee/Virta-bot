@@ -1,0 +1,12 @@
+server:
+  port: 8008
+
+org:
+  slf4j:
+    simpleLogger:
+      defaultLogLevel: debug
+
+
+
+
+

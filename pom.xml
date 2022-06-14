@@ -6,6 +6,10 @@
 
     <name>virta-api-bot</name>
 
+    <modules>
+        <module>webService</module>
+    </modules>
+
     <groupId>ru.newsystems</groupId>
     <artifactId>virtaBot</artifactId>
     <packaging>pom</packaging>
