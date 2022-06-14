@@ -8,6 +8,7 @@
 
     <modules>
         <module>webService</module>
+        <module>baseCore</module>
     </modules>
 
     <groupId>ru.newsystems</groupId>
