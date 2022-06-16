@@ -3,22 +3,14 @@ package ru.newsystems.basecore.integration;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.objects.Update;
-//import ru.newsystems.webservice.service.UpdateReceiveService;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Component
-public class VirtaBot extends TelegramLongPollingBot implements ICustomer {
+public class VirtaBot extends TelegramLongPollingBot implements Customer {
 
-//    private final UpdateReceiveService onUpdateReceive;
-//
-//    public VirtaBot(UpdateReceiveService onUpdateReceive) {
-//        this.onUpdateReceive = onUpdateReceive;
-//    }
-
-    List<ISubscriber> observes = new ArrayList<>();
-
+    List<Subscriber> subscribers = new ArrayList<>();
 
     @Override
     public String getBotUsername() {
@@ -37,8 +29,7 @@ public class VirtaBot extends TelegramLongPollingBot implements ICustomer {
 
     @Override
     public void onUpdateReceived(Update update) {
-//        onUpdateReceive.receive(update, this);
-        notificationObserver(update);
+        notificationSubscribers(update);
     }
 
     @Override
@@ -47,17 +38,17 @@ public class VirtaBot extends TelegramLongPollingBot implements ICustomer {
     }
 
     @Override
-    public void subscribe(ISubscriber o) {
-        observes.add(o);
+    public void subscribe(Subscriber o) {
+        subscribers.add(o);
     }
 
     @Override
-    public void unsubscribe(ISubscriber o) {
-        observes.remove(o);
+    public void unsubscribe(Subscriber o) {
+        subscribers.remove(o);
     }
 
     @Override
-    public void notificationObserver(Update update) {
-        observes.forEach(e -> e.handleEvent(update));
+    public void notificationSubscribers(Update update) {
+        subscribers.forEach(e -> e.handleEvent(update));
     }
 }
