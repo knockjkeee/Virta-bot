@@ -1,19 +1,24 @@
-package ru.newsystems.basecore.model;
+package ru.newsystems.webservice.integration;
 
-import lombok.SneakyThrows;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
-import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
+import ru.newsystems.webservice.service.UpdateReceiveService;
 
 import java.util.List;
-import java.util.function.Consumer;
 
 @Component
 public class VirtaBot extends TelegramLongPollingBot {
+
+    private final UpdateReceiveService onUpdateReceive;
+
+    public VirtaBot(UpdateReceiveService onUpdateReceive) {
+        this.onUpdateReceive = onUpdateReceive;
+    }
+
     @Override
     public String getBotUsername() {
-        return "Test";
+        return "TestBotApi";
     }
 
     @Override
@@ -26,19 +31,10 @@ public class VirtaBot extends TelegramLongPollingBot {
         super.onRegister();
     }
 
-    @SneakyThrows
     @Override
     public void onUpdateReceived(Update update) {
-        String text = update.getMessage().getText();
-        System.out.println(text);
-        SendMessage snd = new SendMessage();
-        snd.setText(text);
-        snd.setChatId(String.valueOf(update.getMessage().getChatId()));
-        snd.setReplyToMessageId(update.getMessage().getMessageId());
-        execute(snd);
+        onUpdateReceive.receive(update, this);
     }
-
-
 
     @Override
     public void onUpdatesReceived(List<Update> updates) {
