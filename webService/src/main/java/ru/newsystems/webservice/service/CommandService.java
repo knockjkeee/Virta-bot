@@ -7,10 +7,11 @@ import ru.newsystems.basecore.integration.VirtaBot;
 import ru.newsystems.basecore.model.dto.CommandUpdateDTO;
 
 @Service
-public class MessageService implements ReceivedUpdate{
+public class CommandService implements ReceivedUpdate {
+
     private final VirtaBot bot;
 
-    public MessageService(VirtaBot bot) {
+    public CommandService(VirtaBot bot) {
         this.bot = bot;
     }
 
@@ -19,7 +20,7 @@ public class MessageService implements ReceivedUpdate{
     public void received(CommandUpdateDTO cUpdate) {
         bot.execute(SendMessage.builder()
                 .chatId(String.valueOf(cUpdate.getUpdate().getMessage().getChatId()))
-                .text("MessageService " + cUpdate.getUpdate().getMessage().getText())
+                .text("CommandService " + cUpdate.getCommand().getText())
                 .replyToMessageId(cUpdate.getUpdate().getMessage().getMessageId())
                 .build());
     }

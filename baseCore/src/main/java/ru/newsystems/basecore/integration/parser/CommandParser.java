@@ -2,11 +2,10 @@ package ru.newsystems.basecore.integration.parser;
 
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.springframework.stereotype.Component;
-import ru.newsystems.basecore.model.dto.Command;
+import ru.newsystems.basecore.model.Command;
 import ru.newsystems.basecore.model.dto.ParseDTO;
 import ru.newsystems.basecore.utils.StringUtil;
 
-import java.util.HashMap;
 import java.util.Optional;
 
 @Component

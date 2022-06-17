@@ -1,4 +1,4 @@
-package ru.newsystems.basecore.model.dto;
+package ru.newsystems.basecore.model;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
