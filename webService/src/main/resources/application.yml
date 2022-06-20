@@ -7,6 +7,13 @@ org:
       defaultLogLevel: debug
 
 
-
-
-
+spring:
+  datasource:
+    url: jdbc:mysql://192.168.246.218:3306/virta
+    username: virta
+    password: virta
+  jpa:
+    hibernate:
+      ddl-auto: update
+    database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
+    open-in-view: false

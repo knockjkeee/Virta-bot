@@ -25,14 +25,13 @@ public class UpdateReceiveService implements Subscriber {
         this.commandService = commandService;
         this.messageService = messageService;
         bot.subscribe(this);
-        this.commandParser = commandParser;
         this.bot = bot;
+        this.commandParser = commandParser;
     }
 
     @SneakyThrows
     @Override
     public void handleEvent(Update update) {
-
         if (update.hasMessage()) {
             String text = update.getMessage().getText();
             Optional<ParseDTO> parseTextToCommand = commandParser.parseCommand(text);
@@ -42,15 +41,6 @@ public class UpdateReceiveService implements Subscriber {
                 messageService.received(new CommandUpdateDTO(update, new ParseDTO(null, text)));
             }
         }
-
-        String text = update.getMessage().getText();
-        Optional<ParseDTO> parseText = commandParser.parseCommand(text);
-        //update.getMessage().from.getId()
-        bot.execute(SendMessage.builder()
-                .chatId(String.valueOf(update.getMessage().getChatId()))
-                .text(text)
-                .replyToMessageId(update.getMessage().getMessageId())
-                .build());
     }
 }
 

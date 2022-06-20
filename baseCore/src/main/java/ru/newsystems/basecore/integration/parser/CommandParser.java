@@ -30,7 +30,8 @@ public class CommandParser implements Parser {
         ImmutablePair<String, String> commandText;
         if (trimText.contains(" ")) {
             int indexOfSpace = trimText.indexOf(" ");
-            commandText = new ImmutablePair<>(trimText.substring(0, indexOfSpace), trimText.substring(indexOfSpace + 1));
+            commandText = new ImmutablePair<>(trimText.substring(0, indexOfSpace), trimText.substring(indexOfSpace
+                    + 1));
         } else commandText = new ImmutablePair<>(trimText, "");
         return commandText;
     }

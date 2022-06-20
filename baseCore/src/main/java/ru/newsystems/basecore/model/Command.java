@@ -11,9 +11,10 @@ import java.util.stream.Stream;
 @RequiredArgsConstructor
 public enum Command {
     START("/start", "Description 1"),
-    MENU("/menu", "Description 2"),
-    HELP("/help", "Description 3"),
-    STOP("/stop", "Description 4");
+    REGISTRATION("/registration", "Description 2"),
+    MY_ID("/my_id", "Description 3"),
+    CREATE_TICKER("/create_ticker", "Description 4"),
+    HELP("/help", "Description 4");
 
     private final String name;
     private final String desc;
