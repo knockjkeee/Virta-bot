@@ -1,7 +1,7 @@
 package ru.newsystems.basecore.utils;
 
 public class NumberUtil {
-    private static final int LENGTH_CHAR_BY_ID = 14;
+    public static final int LENGTH_CHAR_BY_ID = 14;
     private static final int LENGTH_CHAR_BY_TICKET_NUMBER = 15;
 
     public static long getId(String text) {
@@ -15,11 +15,15 @@ public class NumberUtil {
         return 0;
     }
 
-    public static String getIdByTicketNumber(String text) {
+    public static long getIdByTicketNumber(String text) {
         if (isCurrentLength(text, LENGTH_CHAR_BY_TICKET_NUMBER)) {
-            return text;
+            try {
+                return Long.parseLong(text);
+            } catch (NumberFormatException e) {
+                return 0;
+            }
         }
-        return "0";
+        return 0;
     }
 
     public static boolean isCurrentLength(String text, int len) {

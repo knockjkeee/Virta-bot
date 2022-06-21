@@ -1,4 +1,4 @@
-package ru.newsystems.basecore.model;
+package ru.newsystems.basecore.model.domain;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

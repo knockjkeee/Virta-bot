@@ -1,12 +1,14 @@
-package ru.newsystems.basecore.model;
+package ru.newsystems.basecore.model.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.time.Instant;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -72,5 +74,4 @@ public class Ticket {
     @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @JoinColumn(name = "change_by", nullable = false)
     private User changeBy;
-
 }

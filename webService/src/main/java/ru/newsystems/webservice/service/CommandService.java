@@ -4,9 +4,8 @@ import lombok.SneakyThrows;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import ru.newsystems.basecore.integration.VirtaBot;
-import ru.newsystems.basecore.model.Command;
 import ru.newsystems.basecore.model.dto.CommandUpdateDTO;
-import ru.newsystems.basecore.utils.ReceivedText;
+import ru.newsystems.webservice.utils.ReceivedText;
 
 @Service
 public class CommandService implements ReceivedUpdate {
@@ -33,7 +32,6 @@ public class CommandService implements ReceivedUpdate {
             case CREATE_TICKER -> resultText = receivedText.getTextFromCommandCreateTicket(cUpdate);
             case HELP -> resultText = receivedText.getTextFromCommandHelp(cUpdate);
         }
-
 
         bot.execute(SendMessage.builder()
                 .chatId(String.valueOf(cUpdate.getUpdate().getMessage().getChatId()))

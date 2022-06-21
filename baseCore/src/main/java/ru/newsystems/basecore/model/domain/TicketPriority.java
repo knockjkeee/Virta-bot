@@ -1,4 +1,4 @@
-package ru.newsystems.basecore.model;
+package ru.newsystems.basecore.model.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
@@ -12,8 +12,8 @@ import javax.persistence.*;
 @AllArgsConstructor
 @Entity
 @JsonIgnoreProperties(ignoreUnknown = true)
-@Table(name = "ticket_lock_type")
-public class TicketLockType {
+@Table(name = "ticket_priority")
+public class TicketPriority {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)

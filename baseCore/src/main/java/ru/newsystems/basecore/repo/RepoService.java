@@ -1,8 +1,7 @@
 package ru.newsystems.basecore.repo;
 
 import org.springframework.stereotype.Service;
-import ru.newsystems.basecore.model.Ticket;
-import ru.newsystems.basecore.repo.TicketRepo;
+import ru.newsystems.basecore.model.domain.Ticket;
 
 import java.util.Optional;
 

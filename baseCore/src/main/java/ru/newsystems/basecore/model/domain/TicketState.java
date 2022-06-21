@@ -1,4 +1,4 @@
-package ru.newsystems.basecore.model;
+package ru.newsystems.basecore.model.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;

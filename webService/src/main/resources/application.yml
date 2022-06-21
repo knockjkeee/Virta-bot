@@ -6,7 +6,6 @@ org:
     simpleLogger:
       defaultLogLevel: debug
 
-
 spring:
   datasource:
     url: jdbc:mysql://192.168.246.218:3306/virta
@@ -17,3 +16,10 @@ spring:
       ddl-auto: update
     database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
     open-in-view: false
+
+nis:
+  pro:
+    login: PRa
+    password: pr
+    url: http://192.168.246.218
+    path: /otrs/nph-genericinterface.pl/Webservice/Ticket/
