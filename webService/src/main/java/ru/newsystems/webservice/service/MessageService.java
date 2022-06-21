@@ -11,24 +11,16 @@ import ru.newsystems.webservice.utils.ReceivedText;
 public class MessageService implements ReceivedUpdate{
     private final VirtaBot bot;
     private final ReceivedText receivedText;
-    private final RestService restService;
 
-    public MessageService(VirtaBot bot, ReceivedText receivedText, RestService restService) {
+    public MessageService(VirtaBot bot, ReceivedText receivedText) {
         this.bot = bot;
         this.receivedText = receivedText;
-        this.restService = restService;
     }
 
     @SneakyThrows
     @Override
     public void received(CommandUpdateDTO cUpdate) {
         String resultText = receivedText.getTextFromMessage(cUpdate);
-
-
-//        String text = cUpdate.getCommand().getText();
-//
-//            id = getId(text);
-
         bot.execute(SendMessage.builder()
                 .chatId(String.valueOf(cUpdate.getUpdate().getMessage().getChatId()))
                 .text(resultText)

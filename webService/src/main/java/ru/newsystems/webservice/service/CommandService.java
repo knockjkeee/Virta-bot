@@ -13,7 +13,6 @@ public class CommandService implements ReceivedUpdate {
     private final VirtaBot bot;
     private final ReceivedText receivedText;
 
-
     public CommandService(VirtaBot bot, ReceivedText receivedText) {
         this.bot = bot;
         this.receivedText = receivedText;
