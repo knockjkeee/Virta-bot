@@ -21,7 +21,8 @@ public enum Command {
     MY_ID("/my_id", "Description 3"),
     MY_TICKET("/my_ticket", "Description 2"),
     CREATE_TICKER("/create_ticker", "Description 4"),
-    HELP("/help", "Description 4");
+    HELP("/help", "Description 4"),
+    ABOUT("/about", "Description 4");
 
     private final String name;
     private final String desc;

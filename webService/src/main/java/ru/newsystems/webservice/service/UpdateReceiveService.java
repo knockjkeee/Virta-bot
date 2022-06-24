@@ -1,16 +1,17 @@
 package ru.newsystems.webservice.service;
 
-import lombok.SneakyThrows;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import ru.newsystems.basecore.integration.Subscriber;
 import ru.newsystems.basecore.integration.VirtaBot;
 import ru.newsystems.basecore.integration.parser.CommandParser;
-import ru.newsystems.basecore.model.dto.CommandUpdateDTO;
-import ru.newsystems.basecore.model.dto.ParseDTO;
+import ru.newsystems.webservice.handler.update.UpdateHandler;
 
-import java.util.Optional;
+import javax.annotation.PostConstruct;
+import java.util.Comparator;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class UpdateReceiveService implements Subscriber {
@@ -20,6 +21,10 @@ public class UpdateReceiveService implements Subscriber {
     private final CommandService commandService;
     private final MessageService messageService;
 
+
+    @Autowired
+    private List<UpdateHandler> updateHandlers;
+
     public UpdateReceiveService(VirtaBot bot, CommandParser commandParser, CommandService commandService, MessageService messageService) {
         bot.subscribe(this);
         this.bot = bot;
@@ -28,18 +33,36 @@ public class UpdateReceiveService implements Subscriber {
         this.messageService = messageService;
     }
 
-    @SneakyThrows
     @Override
     public void handleEvent(Update update) {
-        if (update.hasMessage()) {
-            String text = update.getMessage().getText();
-            Optional<ParseDTO> parseTextToCommand = commandParser.parseCommand(text);
-            if (parseTextToCommand.isPresent()) {
-                commandService.received(new CommandUpdateDTO(update, parseTextToCommand.get()));
-            } else {
-                messageService.received(new CommandUpdateDTO(update, new ParseDTO(null, text)));
+        for (UpdateHandler updateHandler : updateHandlers) {
+            try {
+                if (updateHandler.handleUpdate(update)) {
+                    return;
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         }
+
+
+//        if (update.hasMessage()) {
+//            String text = update.getMessage().getText();
+//            Optional<ParseDTO> parseTextToCommand = commandParser.parseCommand(text);
+//            if (parseTextToCommand.isPresent()) {
+//                commandService.received(new CommandUpdateDTO(update, parseTextToCommand.get()));
+//            } else {
+//                messageService.received(new CommandUpdateDTO(update, new ParseDTO(null, text)));
+//            }
+//        }
     }
+
+    @PostConstruct
+    public void init() {
+        updateHandlers = updateHandlers.stream()
+                .sorted(Comparator.comparingInt(u -> u.getStage().getOrder()))
+                .collect(Collectors.toList());
+    }
+
 }
 

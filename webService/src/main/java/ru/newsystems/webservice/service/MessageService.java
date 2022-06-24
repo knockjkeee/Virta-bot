@@ -20,7 +20,7 @@ public class MessageService implements ReceivedUpdate{
     @SneakyThrows
     @Override
     public void received(CommandUpdateDTO cUpdate) {
-        String resultText = receivedText.getTextFromMessage(cUpdate);
+        String resultText = receivedText.getTextToMessage(cUpdate);
         bot.execute(SendMessage.builder()
                 .chatId(String.valueOf(cUpdate.getUpdate().getMessage().getChatId()))
                 .text(resultText)
