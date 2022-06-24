@@ -2,7 +2,7 @@ package ru.newsystems.basecore.repo;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-import ru.newsystems.basecore.model.domain.Ticket;
+import ru.newsystems.basecore.model.db.Ticket;
 
 import java.util.Optional;
 

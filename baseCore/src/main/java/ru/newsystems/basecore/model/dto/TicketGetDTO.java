@@ -3,13 +3,16 @@ package ru.newsystems.basecore.model.dto;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
+import ru.newsystems.basecore.model.domain.Error;
 import ru.newsystems.basecore.model.domain.TickerJ;
 
 import java.util.List;
 
 @Data
 @RequiredArgsConstructor
-public class TicketDTOJ {
+public class TicketGetDTO {
+    @JsonProperty("Error")
+    private Error error;
     @JsonProperty("Ticket")
-    private List<TickerJ> ticket;
+    private List<TickerJ> tickets;
 }

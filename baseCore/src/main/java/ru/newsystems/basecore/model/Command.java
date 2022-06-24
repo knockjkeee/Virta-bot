@@ -1,4 +1,4 @@
-package ru.newsystems.basecore.model.domain;
+package ru.newsystems.basecore.model;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -10,9 +10,16 @@ import java.util.stream.Stream;
 @Getter
 @RequiredArgsConstructor
 public enum Command {
+
+    /*start - Start bot
+    my_id - Get information for me
+    my_ticket - Get my ticket by user name
+    create_ticker - Create new ticket
+    help - Help at work
+    */
     START("/start", "Description 1"),
-    REGISTRATION("/registration", "Description 2"),
     MY_ID("/my_id", "Description 3"),
+    MY_TICKET("/my_ticket", "Description 2"),
     CREATE_TICKER("/create_ticker", "Description 4"),
     HELP("/help", "Description 4");
 

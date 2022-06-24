@@ -2,10 +2,16 @@ package ru.newsystems.basecore.integration;
 
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
+import org.telegram.telegrambots.meta.api.methods.commands.SetMyCommands;
 import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrambots.meta.api.objects.commands.BotCommand;
+import ru.newsystems.basecore.model.Command;
 
+import javax.annotation.PostConstruct;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 public class VirtaBot extends TelegramLongPollingBot implements Customer {
@@ -51,4 +57,18 @@ public class VirtaBot extends TelegramLongPollingBot implements Customer {
     public void notificationSubscribers(Update update) {
         subscribers.forEach(e -> e.handleEvent(update));
     }
+
+    @PostConstruct
+    private void setupCommands() {
+        try {
+            List<BotCommand> commands =
+                    Arrays.stream(Command.values())
+                            .map(c -> BotCommand.builder().command(c.getName()).description(c.getDesc()).build())
+                            .collect(Collectors.toList());
+            execute(SetMyCommands.builder().commands(commands).build());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
 }

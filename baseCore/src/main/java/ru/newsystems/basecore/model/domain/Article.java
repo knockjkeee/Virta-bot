@@ -13,9 +13,11 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Article {
     @JsonProperty("ArticleID")
-    private String articleID;
+    private Long articleID;
     @JsonProperty("ArticleNumber")
-    private String articleNumber;
+    private Long articleNumber;
+    @JsonProperty("Attachment")
+    private List<Attachment> attachments;
     @JsonProperty("Bcc")
     private String bcc;
     @JsonProperty("Body")
@@ -23,19 +25,19 @@ public class Article {
     @JsonProperty("Cc")
     private String cc;
     @JsonProperty("ChangeBy")
-    private String changeBy;
+    private Long changeBy;
     @JsonProperty("ChangeTime")
     private String changeTime;
     @JsonProperty("Charset")
     private String charset;
     @JsonProperty("CommunicationChannelID")
-    private String communicationChannelID;
+    private Long communicationChannelID;
     @JsonProperty("ContentCharset")
     private String contentCharset;
     @JsonProperty("ContentType")
     private String contentType;
     @JsonProperty("CreateBy")
-    private String createBy;
+    private Long createBy;
     @JsonProperty("CreateTime")
     private String createTime;
     @JsonProperty("From")
@@ -43,9 +45,9 @@ public class Article {
     @JsonProperty("InReplyTo")
     private String inReplyTo;
     @JsonProperty("IncomingTime")
-    private String incomingTime;
+    private Long incomingTime;
     @JsonProperty("IsVisibleForCustomer")
-    private String IiVisibleForCustomer;
+    private Long IiVisibleForCustomer;
     @JsonProperty("MessageID")
     private String messageID;
     @JsonProperty("MimeType")
@@ -61,11 +63,9 @@ public class Article {
     @JsonProperty("Subject")
     private String subject;
     @JsonProperty("TicketID")
-    private String ticketID;
+    private Long ticketID;
     @JsonProperty("TimeUnit")
-    private String timeUnit;
+    private Long timeUnit;
     @JsonProperty("To")
     private String to;
-    @JsonProperty("Attachment")
-    private List<Attachment> attachments;
 }
