@@ -5,7 +5,7 @@ import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.commands.SetMyCommands;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.commands.BotCommand;
-import ru.newsystems.basecore.model.Command;
+import ru.newsystems.basecore.model.state.Command;
 
 import javax.annotation.PostConstruct;
 import java.util.ArrayList;

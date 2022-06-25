@@ -3,7 +3,7 @@ package ru.newsystems.webservice.utils;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.User;
-import ru.newsystems.basecore.model.domain.TickerJ;
+import ru.newsystems.basecore.model.domain.TicketJ;
 import ru.newsystems.basecore.model.dto.CommandUpdateDTO;
 import ru.newsystems.basecore.model.dto.TicketGetDTO;
 import ru.newsystems.basecore.model.dto.TicketSearchDTO;
@@ -111,7 +111,7 @@ public class ReceivedText {
     }
 
 
-    private String prepareTextFromMessage(TickerJ ticket) {
+    private String prepareTextFromMessage(TicketJ ticket) {
         return "TicketNumber: "
                 + ticket.getTicketNumber()
                 + "\nTitle: "

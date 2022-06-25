@@ -26,5 +26,6 @@ public class MessageService implements ReceivedUpdate{
                 .text(resultText)
                 .replyToMessageId(cUpdate.getUpdate().getMessage().getMessageId())
                 .build());
+
     }
 }

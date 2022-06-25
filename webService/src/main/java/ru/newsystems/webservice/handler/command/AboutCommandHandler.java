@@ -5,7 +5,7 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import ru.newsystems.basecore.integration.VirtaBot;
-import ru.newsystems.basecore.model.Command;
+import ru.newsystems.basecore.model.state.Command;
 
 @Component
 public class AboutCommandHandler implements CommandHandler {

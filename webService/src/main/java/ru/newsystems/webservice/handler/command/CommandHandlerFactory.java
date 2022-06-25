@@ -1,7 +1,7 @@
 package ru.newsystems.webservice.handler.command;
 
 import org.springframework.stereotype.Component;
-import ru.newsystems.basecore.model.Command;
+import ru.newsystems.basecore.model.state.Command;
 
 import javax.annotation.PostConstruct;
 import java.util.HashMap;

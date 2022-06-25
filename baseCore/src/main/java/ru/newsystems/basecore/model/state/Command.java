@@ -1,4 +1,4 @@
-package ru.newsystems.basecore.model;
+package ru.newsystems.basecore.model.state;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -17,12 +17,11 @@ public enum Command {
     create_ticker - Create new ticket
     help - Help at work
     */
-    START("/start", "Description 1"),
-    MY_ID("/my_id", "Description 3"),
-    MY_TICKET("/my_ticket", "Description 2"),
-    CREATE_TICKER("/create_ticker", "Description 4"),
-    HELP("/help", "Description 4"),
-    ABOUT("/about", "Description 4");
+    MY_ID("/my_id", "Get information for me"),
+    MY_TICKET("/my_ticket", "Get my ticket by user name"),
+    CREATE_TICKET("/create_ticker", "Create new ticket"),
+    HELP("/help", "Help at work"),
+    ABOUT("/about", "About me");
 
     private final String name;
     private final String desc;

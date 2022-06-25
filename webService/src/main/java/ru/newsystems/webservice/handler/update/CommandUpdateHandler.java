@@ -4,10 +4,11 @@ import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
+import ru.newsystems.basecore.model.state.UpdateHandlerStage;
 import ru.newsystems.webservice.handler.command.CommandHandler;
 import ru.newsystems.webservice.handler.command.CommandHandlerFactory;
 import ru.newsystems.basecore.integration.parser.CommandParser;
-import ru.newsystems.basecore.model.Command;
+import ru.newsystems.basecore.model.state.Command;
 import ru.newsystems.basecore.model.dto.ParseDTO;
 
 import java.util.Optional;

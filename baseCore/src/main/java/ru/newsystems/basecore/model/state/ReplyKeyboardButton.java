@@ -1,4 +1,4 @@
-package ru.newsystems.basecore.model;
+package ru.newsystems.basecore.model.state;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

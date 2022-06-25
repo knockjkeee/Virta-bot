@@ -1,4 +1,4 @@
-package ru.newsystems.webservice.handler.update;
+package ru.newsystems.basecore.model.state;
 
 public enum UpdateHandlerStage {
     CALLBACK,

@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import ru.newsystems.basecore.model.domain.Error;
-import ru.newsystems.basecore.model.domain.TickerJ;
+import ru.newsystems.basecore.model.domain.TicketJ;
 
 import java.util.List;
 
@@ -14,5 +14,5 @@ public class TicketGetDTO {
     @JsonProperty("Error")
     private Error error;
     @JsonProperty("Ticket")
-    private List<TickerJ> tickets;
+    private List<TicketJ> tickets;
 }

@@ -12,7 +12,7 @@ import java.util.concurrent.TimeUnit;
 @Data
 @RequiredArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class TickerJ {
+public class TicketJ {
 
     @JsonProperty("Age")
     private Long age;

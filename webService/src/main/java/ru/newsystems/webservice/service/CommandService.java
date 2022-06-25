@@ -25,10 +25,9 @@ public class CommandService implements ReceivedUpdate {
         String resultText = "";
 
         switch (cUpdate.getCommand().getCommand()) {
-            case START -> resultText = receivedText.getTextFromCommandStart(cUpdate);
             case MY_ID -> resultText = receivedText.getTextFromCommandMyId(cUpdate);
             case MY_TICKET -> resultText = receivedText.getTextFromCommandMyTicket(cUpdate);
-            case CREATE_TICKER -> resultText = receivedText.getTextFromCommandCreateTicket(cUpdate);
+            case CREATE_TICKET -> resultText = receivedText.getTextFromCommandCreateTicket(cUpdate);
             case HELP -> resultText = receivedText.getTextFromCommandHelp(cUpdate);
         }
 
