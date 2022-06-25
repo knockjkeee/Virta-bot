@@ -9,6 +9,9 @@ import ru.newsystems.basecore.integration.VirtaBot;
 import ru.newsystems.basecore.model.state.MessageState;
 import ru.newsystems.basecore.repo.local.MessageLocalRepo;
 
+import static ru.newsystems.basecore.utils.TelegramUtil.closeReplyKeyBoard;
+
+
 @Component
 public class MessageExitHandler implements MessageHandler{
 
@@ -24,12 +27,7 @@ public class MessageExitHandler implements MessageHandler{
     public boolean handleUpdate(Update update) throws TelegramApiException {
         String text = update.getMessage().getText();
         if (MessageState.getState(text).equals(MessageState.EXIT)) {
-            bot.execute(SendMessage.builder()
-                    .text("✅ Выполнено")
-                    .replyToMessageId(update.getMessage().getMessageId())
-                    .chatId(update.getMessage().getChatId().toString())
-                    .replyMarkup(ReplyKeyboardRemove.builder().removeKeyboard(true).build())
-                    .build());
+            closeReplyKeyBoard(update, bot, true);
             localRepo.remove(update.getMessage().getChatId());
             return true;
         } else {

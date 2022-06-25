@@ -1,12 +1,14 @@
 package ru.newsystems.webservice.handler.update;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.telegram.telegrambots.meta.api.methods.ActionType;
 import org.telegram.telegrambots.meta.api.methods.ParseMode;
+import org.telegram.telegrambots.meta.api.methods.send.SendChatAction;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardRemove;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import ru.newsystems.basecore.integration.VirtaBot;
@@ -21,6 +23,7 @@ import ru.newsystems.basecore.model.state.MessageState;
 import ru.newsystems.basecore.model.state.TicketState;
 import ru.newsystems.basecore.model.state.UpdateHandlerStage;
 import ru.newsystems.basecore.repo.local.MessageLocalRepo;
+import ru.newsystems.webservice.handler.messaga.MessageHandler;
 import ru.newsystems.webservice.service.RestService;
 
 import java.nio.charset.StandardCharsets;
@@ -41,6 +44,9 @@ public class MessageUpdateHandler implements UpdateHandler {
     private final MessageLocalRepo localRepo;
     private final VirtaBot bot;
 
+    @Autowired
+    private List<MessageHandler> messageHandlers;
+
     public MessageUpdateHandler(CommandParser commandParser, RestService restService, MessageLocalRepo localRepo, VirtaBot bot) {
         this.commandParser = commandParser;
         this.localRepo = localRepo;
@@ -55,14 +61,16 @@ public class MessageUpdateHandler implements UpdateHandler {
         String text = message.getText();
         Optional<ParseDTO> command = commandParser.parseCommand(text);
         if (command.isEmpty()) {
-            handleText(update);
-            return true;
+            return handleText(update);
         }
         return false;
     }
 
     private boolean handleText(Update update) throws TelegramApiException {
-
+        bot.execute(SendChatAction.builder()
+                .chatId(String.valueOf(update.getMessage().getChatId()))
+                .action(ActionType.TYPING.toString())
+                .build());
         String text = update.getMessage().getText();
         long tk = getIdByTicketNumber(text);
         Optional<TicketSearchDTO> ticketSearch = tk
@@ -73,6 +81,10 @@ public class MessageUpdateHandler implements UpdateHandler {
             if (ticket.isPresent()) {
                 if (ticket.get().getError() == null) {
                     sendTicketTextMsg(update, ticket.get().getTickets().get(0));
+                    MessageUpdateDTO messageUpdateDTO = new MessageUpdateDTO();
+                    messageUpdateDTO.setTicket(ticket.get().getTickets().get(0));
+                    messageUpdateDTO.setState(MessageState.SHOW);
+                    localRepo.update(update.getMessage().getChatId(), messageUpdateDTO);
                     return true;
                 } else {
                     sendErrorMsg(update, text, ticket.get());
@@ -83,11 +95,17 @@ public class MessageUpdateHandler implements UpdateHandler {
                 return false;
             }
         } else {
-            switch (MessageState.getState(text)) {
-                case SENDCOMMENT -> commentHandler(update);
-                case EXIT -> exitHandler(update);
-                case DOWLOADFILE -> downloadHandler(update);
-                default -> sendExceptionMsg(update, text, "tk");
+            for (MessageHandler messageHandler : messageHandlers) {
+                try {
+                    if (messageHandler.handleUpdate(update)) {
+                        //TODO log good work
+                        return true;
+                    }
+                    //TODO log bad work, search entity
+                } catch (Exception e) {
+                    //TODO log excpt work
+                    e.printStackTrace();
+                }
             }
         }
         //TODO send document
@@ -97,28 +115,10 @@ public class MessageUpdateHandler implements UpdateHandler {
         return false;
     }
 
-    private void commentHandler(Update update) {
-
-    }
-
-    private void downloadHandler(Update update) {
-
-    }
-
-    private void exitHandler(Update update) throws TelegramApiException {
-        bot.execute(SendMessage.builder()
-                .text("✅ Выполнено")
-                .replyToMessageId(update.getMessage().getMessageId())
-                .chatId(update.getMessage().getChatId().toString())
-                .replyMarkup(ReplyKeyboardRemove.builder().removeKeyboard(true).build())
-                .build());
-        localRepo.remove(update.getMessage().getChatId());
-    }
-
     private void sendTicketTextMsg(Update update, TicketJ ticket) throws TelegramApiException {
         String ticketDateTime = ticket.getCreated().replaceAll("\\s+", "T");
         LocalDateTime parseTicket = LocalDateTime.parse(ticketDateTime);
-        String ticketText = "`Результат поиска:`"
+        String ticketText = "*Результат поиска:*"
                 + "\n№ __"
                 + ticket.getTicketNumber()
                 + "__"
@@ -128,7 +128,7 @@ public class MessageUpdateHandler implements UpdateHandler {
                 + TicketState.getState(ticket.getLock()).getLabel()
                 + "\n_Очередь:_ \t"
                 + ticket.getQueue()
-                + "\nПриоритет:_ \t"
+                + "\n_Приоритет:_ \t"
                 + ticket.getPriority()
                 + "\n_Дата создания:_ \t"
                 + parseTicket.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))
@@ -144,7 +144,7 @@ public class MessageUpdateHandler implements UpdateHandler {
         LocalDateTime parseArticle = LocalDateTime.parse(articleDatetime);
         int sizeAttach = article.getAttachments() == null ? 0 : article.getAttachments().size();
         String resultText = ticketText
-                + "\n\n`Крайний комментарий:`"
+                + "\n\n*Последний комментарий:*"
                 + "\n_Дата создания:_\t"
                 + parseArticle.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))
                 + "\n_Время создания:_\t"
@@ -177,14 +177,9 @@ public class MessageUpdateHandler implements UpdateHandler {
                         .keyboardRow(rowRequest)
                         .build())
                 .build());
-        MessageUpdateDTO messageUpdateDTO = new MessageUpdateDTO();
-        messageUpdateDTO.setUpdate(update);
-        messageUpdateDTO.setState(MessageState.SHOW);
-        localRepo.update(update.getMessage().getChatId(), messageUpdateDTO);
     }
 
     private String replaceAllBindCharacter(String text) {
-//        char c = '[';
         return text.replaceAll("#", "/")
                 .replaceAll("]", "/")
                 .replace('[', '/')
