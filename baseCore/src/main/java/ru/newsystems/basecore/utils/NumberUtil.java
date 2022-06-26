@@ -16,6 +16,7 @@ public class NumberUtil {
     }
 
     public static long getIdByTicketNumber(String text) {
+        if (text == null) return 0;
         if (isCurrentLength(text, LENGTH_CHAR_BY_TICKET_NUMBER)) {
             try {
                 return Long.parseLong(text);

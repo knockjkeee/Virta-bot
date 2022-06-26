@@ -34,7 +34,7 @@ public class CommandUpdateHandler implements UpdateHandler{
         String text = message.getText();
         Optional<ParseDTO> command = commandParser.parseCommand(text);
         if (command.isEmpty()) {
-            return false;
+            return message.hasPhoto();
         }
         handleCommand(update, command.get().getCommand(), command.get().getText());
         return true;

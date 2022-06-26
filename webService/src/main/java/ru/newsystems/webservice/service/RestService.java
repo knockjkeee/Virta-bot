@@ -7,8 +7,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
-import ru.newsystems.basecore.model.dto.TicketGetDTO;
-import ru.newsystems.basecore.model.dto.TicketSearchDTO;
+import ru.newsystems.basecore.model.dto.domain.TicketGetDTO;
+import ru.newsystems.basecore.model.dto.domain.TicketSearchDTO;
 
 import java.util.List;
 import java.util.Optional;

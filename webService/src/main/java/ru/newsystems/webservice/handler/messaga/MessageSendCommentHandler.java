@@ -7,8 +7,12 @@ import ru.newsystems.basecore.integration.VirtaBot;
 import ru.newsystems.basecore.model.state.MessageState;
 import ru.newsystems.basecore.repo.local.MessageLocalRepo;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Component
-public class MessageSendCommentHandler implements MessageHandler{
+public class MessageSendCommentHandler implements MessageHandler {
 
     private final MessageLocalRepo localRepo;
     private final VirtaBot bot;
@@ -21,10 +25,19 @@ public class MessageSendCommentHandler implements MessageHandler{
     @Override
     public boolean handleUpdate(Update update) throws TelegramApiException {
         String text = update.getMessage().getText();
-        if (MessageState.getState(text).equals(MessageState.SENDCOMMENT)) {
-            return true;
-        } else {
+
+            if (update.getMessage().getReplyToMessage() != null) {
+                List<String> split = Arrays.stream(update.getMessage().getReplyToMessage().getText().split("№"))
+                        .map(String::strip)
+                        .collect(Collectors.toList());
+                if (split.get(0).contains(MessageState.SENDCOMMENT.getName())) {
+                    //TODO code
+                    return true;
+                }
+                return false;
+            }
             return false;
-        }
     }
+
 }
+

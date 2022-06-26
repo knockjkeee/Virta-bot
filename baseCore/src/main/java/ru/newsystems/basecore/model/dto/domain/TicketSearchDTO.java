@@ -1,4 +1,4 @@
-package ru.newsystems.basecore.model.dto;
+package ru.newsystems.basecore.model.dto.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;

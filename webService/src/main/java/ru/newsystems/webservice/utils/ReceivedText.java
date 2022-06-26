@@ -5,8 +5,8 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.User;
 import ru.newsystems.basecore.model.domain.TicketJ;
 import ru.newsystems.basecore.model.dto.CommandUpdateDTO;
-import ru.newsystems.basecore.model.dto.TicketGetDTO;
-import ru.newsystems.basecore.model.dto.TicketSearchDTO;
+import ru.newsystems.basecore.model.dto.domain.TicketGetDTO;
+import ru.newsystems.basecore.model.dto.domain.TicketSearchDTO;
 import ru.newsystems.basecore.repo.RepoService;
 import ru.newsystems.webservice.service.RestService;
 

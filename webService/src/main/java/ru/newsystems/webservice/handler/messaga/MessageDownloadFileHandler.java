@@ -15,8 +15,11 @@ import ru.newsystems.basecore.repo.local.MessageLocalRepo;
 
 import java.io.ByteArrayInputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Base64;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static ru.newsystems.basecore.utils.TelegramUtil.closeReplyKeyBoard;
 

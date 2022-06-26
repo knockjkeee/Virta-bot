@@ -8,28 +8,31 @@ import org.telegram.telegrambots.meta.api.methods.send.SendChatAction;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import ru.newsystems.basecore.integration.VirtaBot;
 import ru.newsystems.basecore.integration.parser.CommandParser;
 import ru.newsystems.basecore.model.domain.Article;
 import ru.newsystems.basecore.model.domain.TicketJ;
-import ru.newsystems.basecore.model.dto.MessageUpdateDTO;
-import ru.newsystems.basecore.model.dto.ParseDTO;
-import ru.newsystems.basecore.model.dto.TicketGetDTO;
-import ru.newsystems.basecore.model.dto.TicketSearchDTO;
+import ru.newsystems.basecore.model.dto.*;
+import ru.newsystems.basecore.model.dto.callback.DownloadFilesDTO;
+import ru.newsystems.basecore.model.dto.callback.SendCommentDTO;
+import ru.newsystems.basecore.model.dto.domain.TicketGetDTO;
+import ru.newsystems.basecore.model.dto.domain.TicketSearchDTO;
 import ru.newsystems.basecore.model.state.MessageState;
 import ru.newsystems.basecore.model.state.TicketState;
 import ru.newsystems.basecore.model.state.UpdateHandlerStage;
 import ru.newsystems.basecore.repo.local.MessageLocalRepo;
+import ru.newsystems.basecore.utils.StringUtil;
 import ru.newsystems.webservice.handler.messaga.MessageHandler;
 import ru.newsystems.webservice.service.RestService;
 
-import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Base64;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -107,11 +110,8 @@ public class MessageUpdateHandler implements UpdateHandler {
                     e.printStackTrace();
                 }
             }
+            sendExceptionMsg(update, text, "tk");
         }
-        //TODO send document
-        byte[] decode = Base64.getDecoder().decode("MTIzMTIzMTI=".getBytes(StandardCharsets.UTF_8));
-//        bot.execute(SendDocument.builder().chatId(update.getMessage().getChatId().toString())
-//                .document(new InputFile(new ByteArrayInputStream(decode), "text.txt")).build());
         return false;
     }
 
@@ -133,7 +133,7 @@ public class MessageUpdateHandler implements UpdateHandler {
                 + "\n_Дата создания:_ \t"
                 + parseTicket.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))
                 + "\n_Время создания:_ \t"
-                + parseTicket.format(DateTimeFormatter.ofPattern("hh:mm:ss"))
+                + parseTicket.format(DateTimeFormatter.ofPattern("HH:mm:ss"))
                 + "\n_Заголовок:_ \t"
                 + ticket.getTitle()
                 + "\n_Количество комментариев:_ "
@@ -148,7 +148,7 @@ public class MessageUpdateHandler implements UpdateHandler {
                 + "\n_Дата создания:_\t"
                 + parseArticle.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))
                 + "\n_Время создания:_\t"
-                + parseArticle.format(DateTimeFormatter.ofPattern("hh:mm:ss"))
+                + parseArticle.format(DateTimeFormatter.ofPattern("HH:mm:ss"))
                 + "\n_Заголовок:_\t"
                 + replaceAllBindCharacter(article.getSubject())
                 + "\n_От кого:_\t"
@@ -166,16 +166,32 @@ public class MessageUpdateHandler implements UpdateHandler {
         rowText.add(MessageState.DOWLOADFILE.getName());
         rowRequest.add(MessageState.EXIT.getName());
 
+
+        List<List<InlineKeyboardButton>> buttons = new ArrayList<>();
+
+        buttons.add(
+                Arrays.asList(
+                        InlineKeyboardButton.builder()
+                                .text("Отправить комментарий")
+                                .callbackData(StringUtil.serialize(new SendCommentDTO("Отправить комментарий", true)))
+                                .build(),
+                        InlineKeyboardButton.builder()
+                                .text("Выгрузить документы")
+                                .callbackData(StringUtil.serialize(new DownloadFilesDTO("Выгрузить документы", false)))
+                                .build()));
+
         bot.execute(SendMessage.builder()
                 .chatId(String.valueOf(update.getMessage().getChatId()))
                 .text(resultText)
                 .parseMode(ParseMode.MARKDOWNV2)
-                .replyToMessageId(update.getMessage().getMessageId())
-                .replyMarkup(ReplyKeyboardMarkup.builder()
-                        .resizeKeyboard(true)
-                        .keyboardRow(rowText)
-                        .keyboardRow(rowRequest)
-                        .build())
+                .replyToMessageId(update.getMessage().getMessageId()).allowSendingWithoutReply(true)
+//                .replyMarkup(ReplyKeyboardMarkup.builder()
+//                        .resizeKeyboard(true)
+//                        .selective(true)
+//                        .keyboardRow(rowText)
+//                        .keyboardRow(rowRequest)
+//                        .build())
+                .replyMarkup(InlineKeyboardMarkup.builder().keyboard(buttons).build())
                 .build());
     }
 
@@ -192,7 +208,7 @@ public class MessageUpdateHandler implements UpdateHandler {
 
     private void sendExceptionMsg(Update update, String text, String service) throws TelegramApiException {
         String resultText = "❗❗❗️ \n<b>Ошибка в запросе</b>"
-                + "\nВ поиск передано не верное значение: \n["
+                + "\nВ поиск передано не верное значение: ["
                 + service
                 + "] <b>"
                 + text

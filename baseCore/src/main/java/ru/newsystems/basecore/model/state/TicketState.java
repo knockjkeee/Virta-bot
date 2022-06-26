@@ -39,9 +39,9 @@ public enum TicketState {
             case "pending auto close-" -> PENDING_AUTO_CLOSE_DW;
             case "merged" -> MERGED;
             case "closed with workaround" -> CLOSE_WITH_WORKAROUND;
+            case "Отчетность" -> REPORT;
             case "lock" -> LOCK;
             case "unlock" -> UNLOCK;
-            case "Отчетность" -> REPORT;
             default -> NONE;
         };
     }

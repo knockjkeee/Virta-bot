@@ -36,6 +36,4 @@ public class StringUtil {
             return Optional.empty();
         }
     }
-
-
 }

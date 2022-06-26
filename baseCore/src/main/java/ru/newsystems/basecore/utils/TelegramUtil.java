@@ -16,7 +16,7 @@ public class TelegramUtil {
             return null;
         }
         Message message = update.getMessage();
-        if (!message.hasText()) {
+        if (!message.hasText() && !message.hasPhoto()) {
             return null;
         }
         return message;
@@ -24,11 +24,20 @@ public class TelegramUtil {
 
     public static void closeReplyKeyBoard(Update update, VirtaBot bot, boolean isSuccess) throws TelegramApiException {
         String text = isSuccess ? "✅ Выполнено" : "⛔️ У комментария отсутствуют прикрепленыы документы";
-        bot.execute(SendMessage.builder()
-                .text(text)
-                .replyToMessageId(update.getMessage().getMessageId())
-                .chatId(update.getMessage().getChatId().toString())
-                .replyMarkup(ReplyKeyboardRemove.builder().removeKeyboard(true).build())
-                .build());
+        if (update.hasCallbackQuery()) {
+            bot.execute(SendMessage.builder()
+                    .text(text)
+                    .replyToMessageId(update.getCallbackQuery().getMessage().getMessageId())
+                    .chatId(update.getCallbackQuery().getMessage().getChatId().toString())
+                    .build());
+        } else {
+            bot.execute(SendMessage.builder()
+                    .text(text)
+                    .replyToMessageId(update.getMessage().getMessageId())
+                    .chatId(update.getMessage().getChatId().toString())
+                    .replyMarkup(ReplyKeyboardRemove.builder().removeKeyboard(true).build())
+                    .build());
+        }
+
     }
 }
