@@ -15,11 +15,8 @@ import ru.newsystems.basecore.repo.local.MessageLocalRepo;
 
 import java.io.ByteArrayInputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Base64;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static ru.newsystems.basecore.utils.TelegramUtil.closeReplyKeyBoard;
 
@@ -37,6 +34,7 @@ public class MessageDownloadFileHandler implements MessageHandler {
     @Override
     public boolean handleUpdate(Update update) throws TelegramApiException {
         String text = update.getMessage().getText();
+        if (text == null) return false;
         if (MessageState.getState(text).equals(MessageState.DOWLOADFILE)) {
             TicketJ ticket = localRepo.get(update.getMessage().getChatId()).getTicket();
             List<Attachment> attachments = ticket.getArticles().get(ticket.getArticles().size() - 1).getAttachments();

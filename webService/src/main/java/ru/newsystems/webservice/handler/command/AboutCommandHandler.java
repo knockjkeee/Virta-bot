@@ -21,12 +21,17 @@ public class AboutCommandHandler implements CommandHandler {
         bot.execute(SendMessage.builder()
                 .chatId(message.getChatId().toString())
                 .parseMode("html")
-                .text("Этот бот демонстрирует большинство возможностей телеграмм ботов.\n\n"
-                        + "Подписывайтесь на наши соцсети:\n\n"
-                        + "Youtube: https://www.youtube.com/channel/UCUFaGUhKgAECPuMZJxXwdbg\n"
-                        + "Instagram: https://www.instagram.com/mjc.talks/\n"
-                        + "MJC Telegram Chat: https://t.me/mjcby\n"
-                        + "Community page: https://mjc.by")
+                .text("""
+                        Этот бот демонстрирует большинство возможностей
+                        взаимодействия с информационной системой\040
+                        <b>НИС-про|1.0</b>
+                       
+                        <u>Контактная информация:</u>
+                        Адрес: г. Москва, ул ... дом ...
+                        Телефон: +7(499)123-45-67
+                        Почта: info@nic-pro.ru
+                        Группа в VK: https://wwww.vk.com
+                        """)
                 .build());
     }
 

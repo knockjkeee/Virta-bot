@@ -110,6 +110,9 @@ public class MessageUpdateHandler implements UpdateHandler {
                     e.printStackTrace();
                 }
             }
+            if (update.getMessage().hasPhoto()) {
+                return false;
+            }
             sendExceptionMsg(update, text, "tk");
         }
         return false;

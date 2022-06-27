@@ -31,10 +31,10 @@ public class CommandUpdateHandler implements UpdateHandler{
     public boolean handleUpdate(Update update) throws TelegramApiException {
         Message message = getMessage(update);
         if (message == null) return false;
-        String text = message.getText();
+        String text = message.hasPhoto() ? message.getCaption() : message.getText();
         Optional<ParseDTO> command = commandParser.parseCommand(text);
         if (command.isEmpty()) {
-            return message.hasPhoto();
+            return message.hasPhoto() || message.hasDocument();
         }
         handleCommand(update, command.get().getCommand(), command.get().getText());
         return true;

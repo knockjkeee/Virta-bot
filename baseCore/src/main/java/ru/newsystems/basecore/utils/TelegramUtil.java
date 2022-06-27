@@ -17,7 +17,9 @@ public class TelegramUtil {
         }
         Message message = update.getMessage();
         if (!message.hasText() && !message.hasPhoto()) {
-            return null;
+            if (!message.hasDocument()) {
+                return null;
+            }
         }
         return message;
     }
