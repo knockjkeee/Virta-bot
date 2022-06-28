@@ -65,9 +65,6 @@ public class MessageSendCommentHandler implements MessageHandler {
 
                     return true;
                 }
-
-
-
                 return false;
             }
             return false;
