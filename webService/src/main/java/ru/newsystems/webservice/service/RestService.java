@@ -112,7 +112,7 @@ public class RestService {
         arc.put("Body", data.getArticle().getBody());
 
         map.put("TicketNumber", data.getTicketNumber());
-        map.put("CommunicationChannelID", 4);
+        map.put("CommunicationChannelID", 1);
         map.put("Article", arc);
 //
         if (data.getAttaches() != null && data.getAttaches().size() > 0) {

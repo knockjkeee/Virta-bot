@@ -12,6 +12,7 @@ import ru.newsystems.basecore.model.domain.Article;
 import ru.newsystems.basecore.model.domain.Attachment;
 import ru.newsystems.basecore.model.dto.domain.RequestUpdateDTO;
 import ru.newsystems.basecore.model.dto.domain.TicketUpdateDTO;
+import ru.newsystems.basecore.model.state.ContentTypeState;
 import ru.newsystems.basecore.model.state.MessageState;
 import ru.newsystems.basecore.repo.local.MessageLocalRepo;
 import ru.newsystems.webservice.service.RestService;
@@ -78,12 +79,12 @@ public class MessageSendCommentHandler implements MessageHandler {
                             .collect(Collectors.toList());
 
                     List<PhotoSize> photos = update.getMessage().getPhoto();
-//                    PhotoSize photo = photos.size() == 2 ? photos.get(1) : photos.get(0);
-                    PhotoSize photo = photos.get(0);
+                    PhotoSize photo = photos.size() == 2 ? photos.get(1) : photos.get(0);
                     String filePath = prepareBase64(photo.getFileId(), true);
                     String base64 = getBase64(filePath);
                     String fileName = filePath.split("/")[1];
-                    String contentType = fileName.contains(".png") ? "image/x-png" : "image/jpeg";
+                    ContentTypeState state = ContentTypeState.getState(fileName.split("\\.")[1]);
+                    String contentType = state.getContent();
 
                     RequestUpdateDTO req = new RequestUpdateDTO();
                     req.setTicketNumber(Long.valueOf(splitText.get(1)));
