@@ -41,7 +41,7 @@ public class SendMessageHandler extends CallbackUpdateHandler<SendCommentDTO> {
                     .build());
     bot.execute(AnswerCallbackQuery.builder()
             .cacheTime(10)
-            .text("\t⚠️ Форма подачи: ⚠️\n\n<Заголовок> # <Сообщение>\n\nЗагрузка документов опционально")
+            .text("\t⚠️ Форма подачи: ⚠️\n\n<Заголовок> # <Сообщение>\n\nЗагрузка документов опциональна")
             .showAlert(true)
             .callbackQueryId(update.getCallbackQuery().getId())
             .build());

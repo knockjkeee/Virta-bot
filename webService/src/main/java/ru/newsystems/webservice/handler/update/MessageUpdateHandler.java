@@ -16,7 +16,8 @@ import ru.newsystems.basecore.integration.VirtaBot;
 import ru.newsystems.basecore.integration.parser.CommandParser;
 import ru.newsystems.basecore.model.domain.Article;
 import ru.newsystems.basecore.model.domain.TicketJ;
-import ru.newsystems.basecore.model.dto.*;
+import ru.newsystems.basecore.model.dto.MessageUpdateDTO;
+import ru.newsystems.basecore.model.dto.ParseDTO;
 import ru.newsystems.basecore.model.dto.callback.DownloadFilesDTO;
 import ru.newsystems.basecore.model.dto.callback.SendCommentDTO;
 import ru.newsystems.basecore.model.dto.domain.TicketGetDTO;
@@ -32,7 +33,6 @@ import ru.newsystems.webservice.service.RestService;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -172,16 +172,14 @@ public class MessageUpdateHandler implements UpdateHandler {
 
         List<List<InlineKeyboardButton>> buttons = new ArrayList<>();
 
-        buttons.add(
-                Arrays.asList(
-                        InlineKeyboardButton.builder()
-                                .text("Отправить комментарий")
-                                .callbackData(StringUtil.serialize(new SendCommentDTO("Отправить комментарий", true)))
-                                .build(),
-                        InlineKeyboardButton.builder()
-                                .text("Выгрузить документы")
-                                .callbackData(StringUtil.serialize(new DownloadFilesDTO("Выгрузить документы", false)))
-                                .build()));
+        buttons.add(List.of(InlineKeyboardButton.builder()
+                .text("Отправить комментарий")
+                .callbackData(StringUtil.serialize(new SendCommentDTO("Отправить комментарий", true)))
+                .build()));
+        buttons.add(List.of(InlineKeyboardButton.builder()
+                .text("Выгрузить документы")
+                .callbackData(StringUtil.serialize(new DownloadFilesDTO("Выгрузить документы", false)))
+                .build()));
 
         bot.execute(SendMessage.builder()
                 .chatId(String.valueOf(update.getMessage().getChatId()))

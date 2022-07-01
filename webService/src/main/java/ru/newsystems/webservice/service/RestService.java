@@ -7,12 +7,15 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
+import ru.newsystems.basecore.model.domain.Article;
 import ru.newsystems.basecore.model.dto.domain.RequestUpdateDTO;
 import ru.newsystems.basecore.model.dto.domain.TicketGetDTO;
 import ru.newsystems.basecore.model.dto.domain.TicketSearchDTO;
 import ru.newsystems.basecore.model.dto.domain.TicketUpdateDTO;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -56,7 +59,7 @@ public class RestService {
 
     public Optional<TicketUpdateDTO> getTicketOperationUpdate(RequestUpdateDTO data) {
         String urlUpdate = getUrl("TicketUpdate?UserLogin=");
-        HttpEntity<MultiValueMap<String, Object>> requestEntity = getRequestHeaderTickerUpdate(data);
+        HttpEntity<Map<String, Object>> requestEntity = getRequestHeaderTickerUpdate(data);
         ResponseEntity<TicketUpdateDTO> response = restTemplate.exchange(urlUpdate, HttpMethod.POST, requestEntity, TicketUpdateDTO.class);
         if (response.getStatusCode() == HttpStatus.OK) {
             return Optional.ofNullable(response.getBody());
@@ -65,6 +68,15 @@ public class RestService {
         }
     }
 
+    private String getReq(Article article) {
+        StringBuilder res = new StringBuilder();
+        res.append("{");
+        res.append("\"ContentType\":\"text/plain; charset=utf8\",");
+        res.append("\"Subject\":\"").append(article.getSubject()).append("\",");
+        res.append("\"Body\":\"").append(article.getBody()).append("\"}");
+//        res.append("\"To\":").append(article.getTo()).append("}");
+        return res.toString();
+    }
 
     public Optional<TicketSearchDTO> getTicketOperationSearch() {
         String url = getUrl("TicketSearch?UserLogin=");
@@ -91,25 +103,25 @@ public class RestService {
     }
 
 
-    public HttpEntity<MultiValueMap<String, Object>> getRequestHeaderTickerUpdate(RequestUpdateDTO data) {
-        MultiValueMap<String, Object> map = new LinkedMultiValueMap<>();
-        MultiValueMap<String, Object> article = new LinkedMultiValueMap<>();
-        article.add("ContentType", "text/plain; charset=utf8");
-        article.add("Subject", data.getArticle().getSubject());
-        article.add("Body", data.getArticle().getBody());
-        article.add("To", data.getArticle().getTo());
+    public  HttpEntity<Map<String, Object>> getRequestHeaderTickerUpdate(RequestUpdateDTO data) {
+        Map<String, Object> map = new HashMap<>();
+        Map<String, Object> arc = new HashMap<>();
 
-        map.add("TicketNumber", data.getTicketNumber());
-        map.add("CommunicationChannelID", data.getCommunicationChannelID());
-        map.add("Article", article);
+        arc.put("ContentType", "text/plain; charset=utf8");
+        arc.put("Subject", data.getArticle().getSubject());
+        arc.put("Body", data.getArticle().getBody());
 
-        if (data.getAttaches().size() > 0) {
+        map.put("TicketNumber", data.getTicketNumber());
+        map.put("CommunicationChannelID", 4);
+        map.put("Article", arc);
+//
+        if (data.getAttaches() != null && data.getAttaches().size() > 0) {
             data.getAttaches().forEach(e -> {
-                MultiValueMap<String, Object> attach = new LinkedMultiValueMap<>();
-                attach.add("Content", e.getContent());
-                attach.add("ContentType", e.getContentType());
-                attach.add("Filename", e.getFilename());
-                map.add("Attachment", attach);
+                Map<String, Object> attach = new HashMap<>();
+                attach.put("Content", e.getContent());
+                attach.put("ContentType", e.getContentType());
+                attach.put("Filename", e.getFilename());
+                map.put("Attachment", attach);
             });
         }
         return new HttpEntity<>(map, getHttpHeaders(MediaType.APPLICATION_JSON));
