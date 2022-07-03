@@ -126,18 +126,18 @@ public class MessageUpdateHandler implements UpdateHandler {
                 + "\n№ __"
                 + ticket.getTicketNumber()
                 + "__"
-                + "\t"
+                + "\t\t\t"
                 + TicketState.getState(ticket.getState()).getLabel()
                 + "\t"
                 + TicketState.getState(ticket.getLock()).getLabel()
+                + "\n_От:_ \t"
+                + parseTicket.format(DateTimeFormatter.ofPattern("dd/MM/yyyy  HH:mm:ss"))
+//                + "\n_Время создания:_ \t"
+//                + parseTicket.format(DateTimeFormatter.ofPattern("HH:mm:ss"))
                 + "\n_Очередь:_ \t"
                 + ticket.getQueue()
                 + "\n_Приоритет:_ \t"
                 + ticket.getPriority()
-                + "\n_Дата создания:_ \t"
-                + parseTicket.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))
-                + "\n_Время создания:_ \t"
-                + parseTicket.format(DateTimeFormatter.ofPattern("HH:mm:ss"))
                 + "\n_Заголовок:_ \t"
                 + ticket.getTitle()
                 + "\n_Количество комментариев:_ "
@@ -149,19 +149,19 @@ public class MessageUpdateHandler implements UpdateHandler {
         int sizeAttach = article.getAttachments() == null ? 0 : article.getAttachments().size();
         String resultText = ticketText
                 + "\n\n*Последний комментарий:*"
-                + "\n_Дата создания:_\t"
-                + parseArticle.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))
-                + "\n_Время создания:_\t"
-                + parseArticle.format(DateTimeFormatter.ofPattern("HH:mm:ss"))
+                + "\n_От:_ \t"
+                + parseArticle.format(DateTimeFormatter.ofPattern("dd/MM/yyyy  HH:mm:ss"))
+//                + "\n_Время создания:_\t"
+//                + parseArticle.format(DateTimeFormatter.ofPattern("HH:mm:ss"))
                 + "\n_Заголовок:_\t"
                 + replaceAllBindCharacter(article.getSubject())
                 + "\n_От кого:_\t"
                 + replaceAllBindCharacter(article.getFrom())
                 + "\nКому: \t"
                 + replaceAllBindCharacter(article.getTo())
-                + "\n*Тело сообщения:*\n"
+                + "\n_Тело сообщения:_ "
                 + replaceAllBindCharacter(article.getBody())
-                + "\nКоличество файлов прикрепленных к комментарию: \t"
+                + "\n_Количество файлов прикрепленных к комментарию:_ \t"
                 + sizeAttach;
 
         KeyboardRow rowText = new KeyboardRow();
@@ -223,23 +223,6 @@ public class MessageUpdateHandler implements UpdateHandler {
                 .replyToMessageId(update.getMessage().getMessageId())
                 .build());
     }
-
-//    private void sendErrorMsg(Update update, String text, Error error) throws TelegramApiException {
-//        String resultText = "❗️❗❗ \n<b>ErrorCode</b>: "
-//                + error.getErrorCode()
-//                + ""
-//                + "\n<b>ErrorMessage</b>: "
-//                + error.getErrorMessage()
-//                + ""
-//                + "\nby text: "
-//                + text;
-//        bot.execute(SendMessage.builder()
-//                .chatId(String.valueOf(update.getMessage().getChatId()))
-//                .text(resultText)
-//                .parseMode("html")
-//                .replyToMessageId(update.getMessage().getMessageId())
-//                .build());
-//    }
 
     @Override
     public UpdateHandlerStage getStage() {
