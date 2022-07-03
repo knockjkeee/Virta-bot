@@ -38,6 +38,7 @@ import java.util.Optional;
 
 import static ru.newsystems.basecore.utils.NumberUtil.getIdByTicketNumber;
 import static ru.newsystems.basecore.utils.TelegramUtil.getMessage;
+import static ru.newsystems.basecore.utils.TelegramUtil.sendErrorMsg;
 
 @Component
 public class MessageUpdateHandler implements UpdateHandler {
@@ -90,7 +91,7 @@ public class MessageUpdateHandler implements UpdateHandler {
                     localRepo.update(update.getMessage().getChatId(), messageUpdateDTO);
                     return true;
                 } else {
-                    sendErrorMsg(update, text, ticket.get());
+                    sendErrorMsg(bot, update, text, ticket.get().getError());
                     return false;
                 }
             } else {
@@ -223,22 +224,22 @@ public class MessageUpdateHandler implements UpdateHandler {
                 .build());
     }
 
-    private void sendErrorMsg(Update update, String text, TicketGetDTO ticket) throws TelegramApiException {
-        String resultText = "❗️❗❗ \n<b>ErrorCode</b>: "
-                + ticket.getError().getErrorCode()
-                + ""
-                + "\n<b>ErrorMessage</b>: "
-                + ticket.getError().getErrorMessage()
-                + ""
-                + "\nby text: "
-                + text;
-        bot.execute(SendMessage.builder()
-                .chatId(String.valueOf(update.getMessage().getChatId()))
-                .text(resultText)
-                .parseMode("html")
-                .replyToMessageId(update.getMessage().getMessageId())
-                .build());
-    }
+//    private void sendErrorMsg(Update update, String text, Error error) throws TelegramApiException {
+//        String resultText = "❗️❗❗ \n<b>ErrorCode</b>: "
+//                + error.getErrorCode()
+//                + ""
+//                + "\n<b>ErrorMessage</b>: "
+//                + error.getErrorMessage()
+//                + ""
+//                + "\nby text: "
+//                + text;
+//        bot.execute(SendMessage.builder()
+//                .chatId(String.valueOf(update.getMessage().getChatId()))
+//                .text(resultText)
+//                .parseMode("html")
+//                .replyToMessageId(update.getMessage().getMessageId())
+//                .build());
+//    }
 
     @Override
     public UpdateHandlerStage getStage() {

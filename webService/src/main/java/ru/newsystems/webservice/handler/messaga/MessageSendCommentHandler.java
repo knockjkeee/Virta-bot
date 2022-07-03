@@ -26,6 +26,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static ru.newsystems.basecore.utils.TelegramUtil.closeReplyKeyBoard;
+import static ru.newsystems.basecore.utils.TelegramUtil.sendErrorMsg;
+
 @Component
 public class MessageSendCommentHandler implements MessageHandler {
 
@@ -42,31 +45,34 @@ public class MessageSendCommentHandler implements MessageHandler {
     @Override
     public boolean handleUpdate(Update update) throws TelegramApiException {
         if (update.getMessage().getReplyToMessage() != null) {
-            List<String> splitText = splitMessageText(update.getMessage().getReplyToMessage().getText(), "№");
-            if (splitText.get(0).contains(MessageState.SENDCOMMENT.getName())) {
+            List<String> replyTexts = splitMessageText(update.getMessage().getReplyToMessage().getText(), "№");
+            if (replyTexts.get(0).contains(MessageState.SENDCOMMENT.getName())) {
                 //TODO code
                 // 1 message
                 // 2 photo
                 // 3 document
 
                 if (update.getMessage().hasText()) {
-                    List<String> splitMessage = splitMessageText(update.getMessage().getText(), "#");
-                    RequestUpdateDTO req = prepareReqWithMessage(splitText, splitMessage);
-                    Optional<TicketUpdateDTO> ticketOperationUpdate = restService.getTicketOperationUpdate(req);
+                    List<String> messages = splitMessageText(update.getMessage().getText(), "#");
+                    if (checkCorrectlySendFormatSubjectMessage(update, messages)) return true;
+                    RequestUpdateDTO req = prepareReqWithMessage(replyTexts, messages);
+                    SendNewComment(update, req);
                     return true;
                 }
 
                 if (update.getMessage().hasPhoto()) {
-                    List<String> splitMessage = splitMessageText(update.getMessage().getCaption(), "#");
-                    RequestUpdateDTO req = prepareReqWithPhoto(update, splitText, splitMessage);
-                    Optional<TicketUpdateDTO> ticketOperationUpdate = restService.getTicketOperationUpdate(req);
+                    List<String> messages = splitMessageText(update.getMessage().getCaption(), "#");
+                    if (checkCorrectlySendFormatSubjectMessage(update, messages)) return true;
+                    RequestUpdateDTO req = prepareReqWithPhoto(update, replyTexts, messages);
+                    SendNewComment(update, req);
                     return true;
                 }
 
                 if (update.getMessage().hasDocument()) {
-                    List<String> splitMessage = splitMessageText(update.getMessage().getCaption(), "#");
-                    RequestUpdateDTO req = prepareReqWithDocument(update, splitText, splitMessage);
-                    Optional<TicketUpdateDTO> ticketOperationUpdate = restService.getTicketOperationUpdate(req);
+                    List<String> messages = splitMessageText(update.getMessage().getCaption(), "#");
+                    if (checkCorrectlySendFormatSubjectMessage(update, messages)) return true;
+                    RequestUpdateDTO req = prepareReqWithDocument(update, replyTexts, messages);
+                    SendNewComment(update, req);
                     return true;
                 }
                 return false;
@@ -74,6 +80,24 @@ public class MessageSendCommentHandler implements MessageHandler {
             return false;
         }
         return false;
+    }
+
+    private boolean checkCorrectlySendFormatSubjectMessage(Update update, List<String> splitMessage) throws TelegramApiException {
+        if (splitMessage.size() != 2) {
+            closeReplyKeyBoard(update, bot, false);
+            return true;
+        }
+        return false;
+    }
+
+    private void SendNewComment(Update update, RequestUpdateDTO req) throws TelegramApiException {
+        Optional<TicketUpdateDTO> ticketOperationUpdate = restService.getTicketOperationUpdate(req);
+        if (ticketOperationUpdate.isPresent() && ticketOperationUpdate.get().getError() == null) {
+            closeReplyKeyBoard(update, bot, true);
+        } else {
+            sendErrorMsg(bot, update, update.getMessage().getReplyToMessage().getText(), ticketOperationUpdate.get()
+                    .getError());
+        }
     }
 
     private Attachment prepareAttachmentFromDocument(Update update) throws TelegramApiException {
@@ -86,63 +110,58 @@ public class MessageSendCommentHandler implements MessageHandler {
         String filePath = getFilePath(update);
         String base64 = getBase64(filePath);
         String fileName = filePath.split("/")[1];
-        ContentTypeState state = ContentTypeState.getState(fileName.split("\\.")[1]);
-        String contentType = state.getContent();
+        String contentType = ContentTypeState.getState(fileName.split("\\.")[1]).getContent();
         return prepareAttach(base64, contentType, fileName);
     }
 
     @NotNull
-    private RequestUpdateDTO prepareReqWithDocument(Update update, List<String> splitText, List<String> splitMessage) throws TelegramApiException {
+    private RequestUpdateDTO prepareReqWithDocument(Update update, List<String> texts, List<String> messages) throws TelegramApiException {
         Document document = update.getMessage().getDocument();
         String base64 = prepareBase64(document.getFileId(), false);
-        return prepareReqWithAttach(splitText, splitMessage, base64, document.getMimeType(), document.getFileName());
+        return prepareReqWithAttachment(texts, messages, base64, document.getMimeType(), document.getFileName());
     }
 
     @NotNull
-    private RequestUpdateDTO prepareReqWithPhoto(Update update, List<String> splitText, List<String> splitMessage) throws TelegramApiException {
+    private RequestUpdateDTO prepareReqWithPhoto(Update update, List<String> texts, List<String> messages) throws TelegramApiException {
         String filePath = getFilePath(update);
         String base64 = getBase64(filePath);
         String fileName = filePath.split("/")[1];
-        ContentTypeState state = ContentTypeState.getState(fileName.split("\\.")[1]);
-        String contentType = state.getContent();
-        return prepareReqWithAttach(splitText, splitMessage, base64, contentType, fileName);
+        String contentType  = ContentTypeState.getState(fileName.split("\\.")[1]).getContent();
+        return prepareReqWithAttachment(texts, messages, base64, contentType, fileName);
     }
 
     @NotNull
-    private RequestUpdateDTO prepareReqWithAttach(List<String> splitText, List<String> splitMessage, String base64, String mimeType, String fileName2) {
-        RequestUpdateDTO req = prepareReqWithMessage(splitText, splitMessage);
-        Attachment attach = new Attachment();
-        attach.setContent(base64);
-        attach.setContentType(mimeType);
-        attach.setFilename(fileName2);
+    private RequestUpdateDTO prepareReqWithAttachment(List<String> texts, List<String> messages, String base64, String contentType, String fileName) {
+        RequestUpdateDTO req = prepareReqWithMessage(texts, messages);
+        Attachment attach = prepareAttach(base64, contentType, fileName);
         req.setAttaches(List.of(attach));
         return req;
+    }
+
+    @NotNull
+    private RequestUpdateDTO prepareReqWithMessage(List<String> texts, List<String> messages) {
+        RequestUpdateDTO req = new RequestUpdateDTO();
+        req.setTicketNumber(Long.valueOf(texts.get(1)));
+        Article article = new Article();
+        article.setSubject(messages.get(0));
+        article.setBody(messages.get(1));
+        req.setArticle(article);
+        return req;
+    }
+
+    @NotNull
+    private Attachment prepareAttach(String base64, String contentType, String fileName) {
+        Attachment attach = new Attachment();
+        attach.setContent(base64);
+        attach.setContentType(contentType);
+        attach.setFilename(fileName);
+        return attach;
     }
 
     private String getFilePath(Update update) throws TelegramApiException {
         List<PhotoSize> photos = update.getMessage().getPhoto();
         PhotoSize photo = photos.size() == 2 ? photos.get(1) : photos.get(0);
         return prepareBase64(photo.getFileId(), true);
-    }
-
-    @NotNull
-    private Attachment prepareAttach(String base64, String contentType, String fileName2) {
-        Attachment attach = new Attachment();
-        attach.setContent(base64);
-        attach.setContentType(contentType);
-        attach.setFilename(fileName2);
-        return attach;
-    }
-
-    @NotNull
-    private RequestUpdateDTO prepareReqWithMessage(List<String> splitText, List<String> splitMessage) {
-        RequestUpdateDTO req = new RequestUpdateDTO();
-        req.setTicketNumber(Long.valueOf(splitText.get(1)));
-        Article article = new Article();
-        article.setSubject(splitMessage.get(0));
-        article.setBody(splitMessage.get(1));
-        req.setArticle(article);
-        return req;
     }
 
     @NotNull
