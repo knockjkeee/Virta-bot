@@ -24,6 +24,7 @@ import java.util.Arrays;
 import java.util.Base64;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.stream.Collectors;
 
 import static ru.newsystems.basecore.utils.TelegramUtil.closeReplyKeyBoard;
@@ -33,11 +34,13 @@ import static ru.newsystems.basecore.utils.TelegramUtil.sendErrorMsg;
 public class MessageSendCommentHandler implements MessageHandler {
 
     private final MessageLocalRepo localRepo;
+    private final ScheduledExecutorService executor;
     private final RestService restService;
     private final VirtaBot bot;
 
-    public MessageSendCommentHandler(MessageLocalRepo localRepo, RestService restService, VirtaBot bot) {
+    public MessageSendCommentHandler(MessageLocalRepo localRepo, ScheduledExecutorService executor, RestService restService, VirtaBot bot) {
         this.localRepo = localRepo;
+        this.executor = executor;
         this.restService = restService;
         this.bot = bot;
     }

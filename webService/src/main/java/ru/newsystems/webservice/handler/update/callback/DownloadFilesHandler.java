@@ -4,6 +4,7 @@ import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.ActionType;
 import org.telegram.telegrambots.meta.api.methods.send.SendChatAction;
 import org.telegram.telegrambots.meta.api.methods.send.SendDocument;
+import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.InputFile;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
@@ -43,13 +44,20 @@ public class DownloadFilesHandler extends CallbackUpdateHandler<DownloadFilesDTO
     @Override
     protected void handleCallback(Update update, DownloadFilesDTO dto) throws TelegramApiException {
         Long id = update.getCallbackQuery().getMessage().getChatId();
-        TicketJ ticket = localRepo.get(id).getTicket();
-        List<Attachment> attachments = ticket.getArticles().get(ticket.getArticles().size() - 1).getAttachments();
         bot.execute(SendChatAction.builder()
                 .chatId(String.valueOf(update.getCallbackQuery().getMessage().getChatId()))
                 .action(ActionType.UPLOADDOCUMENT.toString())
                 .build());
-        if (attachments.size() != 0) {
+        TicketJ ticket = localRepo.get(id).getTicket();
+        List<Attachment> attachments = ticket.getArticles().get(ticket.getArticles().size() - 1).getAttachments();
+        if (attachments == null) {
+            String text = "⛔️ Файлы для скачивания отсутсвуют в последнем комментарии.";
+            bot.execute(SendMessage.builder()
+                    .text(text)
+                    .replyToMessageId(update.getCallbackQuery().getMessage().getMessageId())
+                    .chatId(update.getCallbackQuery().getMessage().getChatId().toString())
+                    .build());
+        } else if (attachments.size() != 0) {
             attachments.forEach(e -> {
                 try {
                     prepareFileToSend(update, e);
