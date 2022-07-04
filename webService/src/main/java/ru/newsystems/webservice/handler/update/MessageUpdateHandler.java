@@ -37,8 +37,8 @@ import java.util.List;
 import java.util.Optional;
 
 import static ru.newsystems.basecore.utils.NumberUtil.getIdByTicketNumber;
-import static ru.newsystems.basecore.utils.TelegramUtil.getMessage;
-import static ru.newsystems.basecore.utils.TelegramUtil.sendErrorMsg;
+import static ru.newsystems.webservice.utils.TelegramUtil.getMessage;
+import static ru.newsystems.webservice.utils.TelegramUtil.sendErrorMsg;
 
 @Component
 public class MessageUpdateHandler implements UpdateHandler {

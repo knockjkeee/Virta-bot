@@ -18,7 +18,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.List;
 
-import static ru.newsystems.basecore.utils.TelegramUtil.closeReplyKeyBoard;
+import static ru.newsystems.webservice.utils.TelegramUtil.closeReplyKeyBoard;
 
 @Component
 public class MessageDownloadFileHandler implements MessageHandler {

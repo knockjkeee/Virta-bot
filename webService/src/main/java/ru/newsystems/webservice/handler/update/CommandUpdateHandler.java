@@ -13,7 +13,7 @@ import ru.newsystems.basecore.model.dto.ParseDTO;
 
 import java.util.Optional;
 
-import static ru.newsystems.basecore.utils.TelegramUtil.getMessage;
+import static ru.newsystems.webservice.utils.TelegramUtil.getMessage;
 
 @Component
 public class CommandUpdateHandler implements UpdateHandler{

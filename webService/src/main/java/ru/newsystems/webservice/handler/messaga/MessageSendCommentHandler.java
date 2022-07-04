@@ -8,6 +8,7 @@ import org.telegram.telegrambots.meta.api.objects.PhotoSize;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import ru.newsystems.basecore.integration.VirtaBot;
+import ru.newsystems.webservice.task.SendOperationTask;
 import ru.newsystems.basecore.model.domain.Article;
 import ru.newsystems.basecore.model.domain.Attachment;
 import ru.newsystems.basecore.model.dto.domain.RequestUpdateDTO;
@@ -27,8 +28,8 @@ import java.util.Optional;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.stream.Collectors;
 
-import static ru.newsystems.basecore.utils.TelegramUtil.closeReplyKeyBoard;
-import static ru.newsystems.basecore.utils.TelegramUtil.sendErrorMsg;
+import static ru.newsystems.webservice.utils.TelegramUtil.closeReplyKeyBoard;
+import static ru.newsystems.webservice.utils.TelegramUtil.sendErrorMsg;
 
 @Component
 public class MessageSendCommentHandler implements MessageHandler {
@@ -58,7 +59,10 @@ public class MessageSendCommentHandler implements MessageHandler {
                 if (update.getMessage().hasText()) {
                     List<String> messages = splitMessageText(update.getMessage().getText(), "#");
                     if (checkCorrectlySendFormatSubjectMessage(update, messages)) return true;
+
                     RequestUpdateDTO req = prepareReqWithMessage(replyTexts, messages);
+                    SendOperationTask task = new SendOperationTask();
+
                     SendNewComment(update, req);
                     return true;
                 }

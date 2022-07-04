@@ -1,4 +1,4 @@
-package ru.newsystems.basecore.utils;
+package ru.newsystems.webservice.utils;
 
 import org.jetbrains.annotations.Nullable;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
@@ -42,7 +42,6 @@ public class TelegramUtil {
         }
     }
 
-
     public static void sendErrorMsg(VirtaBot bot, Update update, String text, Error error) throws TelegramApiException {
         String resultText = "❗️❗❗ \n<b>ErrorCode</b>: "
                 + error.getErrorCode()
@@ -68,4 +67,5 @@ public class TelegramUtil {
                     .build());
         }
     }
+
 }
