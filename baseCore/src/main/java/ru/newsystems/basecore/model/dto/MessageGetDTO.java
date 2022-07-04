@@ -7,7 +7,7 @@ import ru.newsystems.basecore.model.state.MessageState;
 
 @Data
 @RequiredArgsConstructor
-public class MessageUpdateDTO {
+public class MessageGetDTO {
     TicketJ ticket;
     MessageState state;
 }

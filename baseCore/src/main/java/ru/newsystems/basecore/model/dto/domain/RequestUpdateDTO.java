@@ -10,7 +10,6 @@ import java.util.List;
 @Data
 @RequiredArgsConstructor
 public class RequestUpdateDTO {
-//    private Long communicationChannelID;
     private Long ticketNumber;
     private Article article;
     List<Attachment> attaches;

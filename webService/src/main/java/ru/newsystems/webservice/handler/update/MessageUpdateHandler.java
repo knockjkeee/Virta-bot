@@ -16,7 +16,7 @@ import ru.newsystems.basecore.integration.VirtaBot;
 import ru.newsystems.basecore.integration.parser.CommandParser;
 import ru.newsystems.basecore.model.domain.Article;
 import ru.newsystems.basecore.model.domain.TicketJ;
-import ru.newsystems.basecore.model.dto.MessageUpdateDTO;
+import ru.newsystems.basecore.model.dto.MessageGetDTO;
 import ru.newsystems.basecore.model.dto.ParseDTO;
 import ru.newsystems.basecore.model.dto.callback.DownloadFilesDTO;
 import ru.newsystems.basecore.model.dto.callback.SendCommentDTO;
@@ -85,10 +85,10 @@ public class MessageUpdateHandler implements UpdateHandler {
             if (ticket.isPresent()) {
                 if (ticket.get().getError() == null) {
                     sendTicketTextMsg(update, ticket.get().getTickets().get(0));
-                    MessageUpdateDTO messageUpdateDTO = new MessageUpdateDTO();
-                    messageUpdateDTO.setTicket(ticket.get().getTickets().get(0));
-                    messageUpdateDTO.setState(MessageState.SHOW);
-                    localRepo.update(update.getMessage().getChatId(), messageUpdateDTO);
+                    MessageGetDTO messageGetDTO = new MessageGetDTO();
+                    messageGetDTO.setTicket(ticket.get().getTickets().get(0));
+                    messageGetDTO.setState(MessageState.SHOW);
+                    localRepo.update(update.getMessage().getChatId(), messageGetDTO);
                     return true;
                 } else {
                     sendErrorMsg(bot, update, text, ticket.get().getError());

@@ -4,26 +4,30 @@ import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import ru.newsystems.basecore.integration.VirtaBot;
+import ru.newsystems.basecore.model.domain.Attachment;
 import ru.newsystems.basecore.model.dto.domain.RequestUpdateDTO;
 import ru.newsystems.basecore.model.state.MessageState;
-import ru.newsystems.basecore.repo.local.MessageLocalRepo;
 import ru.newsystems.webservice.service.RestService;
+import ru.newsystems.webservice.task.SendLocalRepo;
 import ru.newsystems.webservice.task.SendOperationTask;
+import ru.newsystems.webservice.task.SendUpdateDTO;
 
 import java.util.List;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 
 import static ru.newsystems.webservice.utils.TelegramUtil.*;
 
 @Component
 public class MessageSendCommentHandler implements MessageHandler {
 
-    private final MessageLocalRepo localRepo;
+    private final SendLocalRepo localRepo;
     private final ScheduledExecutorService executor;
     private final RestService restService;
     private final VirtaBot bot;
 
-    public MessageSendCommentHandler(MessageLocalRepo localRepo, ScheduledExecutorService executor, RestService restService, VirtaBot bot) {
+    public MessageSendCommentHandler(SendLocalRepo localRepo, ScheduledExecutorService executor, RestService restService, VirtaBot bot) {
         this.localRepo = localRepo;
         this.executor = executor;
         this.restService = restService;
@@ -45,9 +49,18 @@ public class MessageSendCommentHandler implements MessageHandler {
                     if (checkCorrectlySendFormatSubjectMessage(update, messages)) return true;
 
                     RequestUpdateDTO req = prepareReqWithMessage(replyTexts, messages);
-                    SendOperationTask task = new SendOperationTask();
-
-                    SendNewComment(update, req, restService, bot);
+                    SendOperationTask task = SendOperationTask.builder()
+                            .req(req)
+                            .update(update)
+                            .bot(bot)
+                            .restService(restService)
+                            .build();
+                    ScheduledFuture<?> schedule = executor.schedule(task, 5, TimeUnit.SECONDS);
+                    SendUpdateDTO sendUpdateDTO = SendUpdateDTO.builder()
+                            .task(task)
+                            .schedule(schedule)
+                            .build();
+                    localRepo.update(update.getMessage().getChatId(), sendUpdateDTO);
                     return true;
                 }
 
@@ -55,15 +68,30 @@ public class MessageSendCommentHandler implements MessageHandler {
                     List<String> messages = splitMessageText(update.getMessage().getCaption(), "#");
                     if (checkCorrectlySendFormatSubjectMessage(update, messages)) return true;
                     RequestUpdateDTO req = prepareReqWithPhoto(update, replyTexts, messages, bot);
-                    SendNewComment(update, req, restService, bot);
+                    sendNewComment(update, req, restService, bot);
                     return true;
                 }
 
                 if (update.getMessage().hasDocument()) {
+
+                    //TODO add executor update Task
+                    SendUpdateDTO sendUpdateDTO = localRepo.get(update.getMessage().getChatId());
+                    if (sendUpdateDTO != null && !sendUpdateDTO.getSchedule().isDone()) {
+                        sendUpdateDTO.stopSchedule();
+                        SendOperationTask task = sendUpdateDTO.getTask();
+                        Attachment attachment = prepareAttachmentFromDocument(update, bot);
+                        task.updateAttachment(attachment);
+                        ScheduledFuture<?> schedule = executor.schedule(task, 5, TimeUnit.SECONDS);
+                        sendUpdateDTO.setSchedule(schedule);
+                        sendUpdateDTO.setTask(task);
+                        localRepo.update(update.getMessage().getDate().longValue() - 1, sendUpdateDTO);
+                        return  true;
+                    }
+
                     List<String> messages = splitMessageText(update.getMessage().getCaption(), "#");
                     if (checkCorrectlySendFormatSubjectMessage(update, messages)) return true;
                     RequestUpdateDTO req = prepareReqWithDocument(update, replyTexts, messages, bot);
-                    SendNewComment(update, req, restService, bot);
+                    sendNewComment(update, req, restService, bot);
                     return true;
                 }
                 return false;
@@ -80,18 +108,5 @@ public class MessageSendCommentHandler implements MessageHandler {
         }
         return false;
     }
-
-//    private void SendNewComment(Update update, RequestUpdateDTO req) throws TelegramApiException {
-//        Optional<TicketUpdateDTO> ticketOperationUpdate = restService.getTicketOperationUpdate(req);
-//        if (ticketOperationUpdate.isPresent() && ticketOperationUpdate.get().getError() == null) {
-//            closeReplyKeyBoard(update, bot, true);
-//        } else {
-//            sendErrorMsg(bot, update, update.getMessage().getReplyToMessage().getText(), ticketOperationUpdate.get()
-//                    .getError());
-//        }
-//    }
-
-
-
 }
 

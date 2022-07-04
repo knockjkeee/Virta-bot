@@ -13,10 +13,7 @@ import ru.newsystems.basecore.model.dto.domain.TicketGetDTO;
 import ru.newsystems.basecore.model.dto.domain.TicketSearchDTO;
 import ru.newsystems.basecore.model.dto.domain.TicketUpdateDTO;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class RestService {
@@ -116,13 +113,17 @@ public class RestService {
         map.put("Article", arc);
 //
         if (data.getAttaches() != null && data.getAttaches().size() > 0) {
+            List<Object> obj = new ArrayList<>();
+
             data.getAttaches().forEach(e -> {
                 Map<String, Object> attach = new HashMap<>();
                 attach.put("Content", e.getContent());
                 attach.put("ContentType", e.getContentType());
                 attach.put("Filename", e.getFilename());
-                map.put("Attachment", attach);
+                obj.add(attach);
+//                map.put("Attachment", attach);
             });
+            map.put("Attachment", obj);
         }
         return new HttpEntity<>(map, getHttpHeaders(MediaType.APPLICATION_JSON));
     }
