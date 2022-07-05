@@ -22,6 +22,8 @@ import static ru.newsystems.webservice.utils.TelegramUtil.*;
 @Component
 public class MessageSendCommentHandler implements MessageHandler {
 
+    public static final int DELAY_FOR_ADD_DOCS_OR_PIC = 5;
+    public static final int DELAY_FOR_AFTER_ADD_MSG = 3;
     private final SendLocalRepo localRepo;
     private final ScheduledExecutorService executor;
     private final RestService restService;
@@ -39,53 +41,44 @@ public class MessageSendCommentHandler implements MessageHandler {
         if (update.getMessage().getReplyToMessage() != null) {
             List<String> replyTexts = splitMessageText(update.getMessage().getReplyToMessage().getText(), "№");
             if (replyTexts.get(0).contains(MessageState.SENDCOMMENT.getName())) {
-                //TODO code
-                // 1 message
-                // 2 photo
-                // 3 document
-
                 if (update.getMessage().hasText()) {
                     List<String> messages = splitMessageText(update.getMessage().getText(), "#");
                     if (checkCorrectlySendFormatSubjectMessage(update, messages)) return true;
-
                     RequestUpdateDTO req = prepareReqWithMessage(replyTexts, messages);
-                    SendOperationTask task = SendOperationTask.builder()
-                            .req(req)
-                            .update(update)
-                            .bot(bot)
-                            .restService(restService)
-                            .build();
-                    ScheduledFuture<?> schedule = executor.schedule(task, 5, TimeUnit.SECONDS);
-                    SendUpdateDTO sendUpdateDTO = SendUpdateDTO.builder()
-                            .task(task)
-                            .schedule(schedule)
-                            .build();
-                    localRepo.update(update.getMessage().getChatId(), sendUpdateDTO);
+                    prepareTaskForExecutor(update, req);
                     return true;
                 }
 
                 if (update.getMessage().hasPhoto()) {
-                    List<String> messages = splitMessageText(update.getMessage().getCaption(), "#");
-                    if (checkCorrectlySendFormatSubjectMessage(update, messages)) return true;
-                    RequestUpdateDTO req = prepareReqWithPhoto(update, replyTexts, messages, bot);
-                    sendNewComment(update, req, restService, bot);
-                    return true;
+                    SendUpdateDTO sendUpdateDTO = localRepo.get(update.getMessage().getChatId());
+                    if (sendUpdateDTO != null && !sendUpdateDTO.getSchedule().isDone()) {
+                        sendUpdateDTO.stopSchedule();
+                        SendOperationTask task = sendUpdateDTO.getTask();
+                        Attachment attachment = prepareAttachmentFromPhoto(update, bot);
+                        prepareTaskForExecutor(update, sendUpdateDTO, task, attachment);
+                        return true;
+                    } else {
+                        List<String> messages = splitMessageText(update.getMessage().getCaption(), "#");
+                        if (checkCorrectlySendFormatSubjectMessage(update, messages)) return true;
+                        RequestUpdateDTO req = prepareReqWithPhoto(update, replyTexts, messages, bot);
+                        if ((sendUpdateDTO == null || sendUpdateDTO.getSchedule().isDone())
+                                && update.getMessage().getMediaGroupId() != null) {
+                            prepareTaskForExecutor(update, req);
+                            return true;
+                        }
+                        sendNewComment(update, req, restService, bot);
+                        return true;
+                    }
                 }
 
                 if (update.getMessage().hasDocument()) {
-
-                    //TODO add executor update Task
                     SendUpdateDTO sendUpdateDTO = localRepo.get(update.getMessage().getChatId());
                     if (sendUpdateDTO != null && !sendUpdateDTO.getSchedule().isDone()) {
                         sendUpdateDTO.stopSchedule();
                         SendOperationTask task = sendUpdateDTO.getTask();
                         Attachment attachment = prepareAttachmentFromDocument(update, bot);
-                        task.updateAttachment(attachment);
-                        ScheduledFuture<?> schedule = executor.schedule(task, 5, TimeUnit.SECONDS);
-                        sendUpdateDTO.setSchedule(schedule);
-                        sendUpdateDTO.setTask(task);
-                        localRepo.update(update.getMessage().getDate().longValue() - 1, sendUpdateDTO);
-                        return  true;
+                        prepareTaskForExecutor(update, sendUpdateDTO, task, attachment);
+                        return true;
                     }
 
                     List<String> messages = splitMessageText(update.getMessage().getCaption(), "#");
@@ -99,6 +92,26 @@ public class MessageSendCommentHandler implements MessageHandler {
             return false;
         }
         return false;
+    }
+
+    private void prepareTaskForExecutor(Update update, SendUpdateDTO sendUpdateDTO, SendOperationTask task, Attachment attachment) {
+        task.updateAttachment(attachment);
+        ScheduledFuture<?> schedule = executor.schedule(task, DELAY_FOR_AFTER_ADD_MSG, TimeUnit.SECONDS);
+        sendUpdateDTO.setSchedule(schedule);
+        sendUpdateDTO.setTask(task);
+        localRepo.update(update.getMessage().getDate().longValue() - 1, sendUpdateDTO);
+    }
+
+    private void prepareTaskForExecutor(Update update, RequestUpdateDTO req) {
+        SendOperationTask task = SendOperationTask.builder()
+                .req(req)
+                .update(update)
+                .bot(bot)
+                .restService(restService)
+                .build();
+        ScheduledFuture<?> schedule = executor.schedule(task, DELAY_FOR_ADD_DOCS_OR_PIC, TimeUnit.SECONDS);
+        SendUpdateDTO sendUpdateDTO = SendUpdateDTO.builder().task(task).schedule(schedule).build();
+        localRepo.update(update.getMessage().getChatId(), sendUpdateDTO);
     }
 
     private boolean checkCorrectlySendFormatSubjectMessage(Update update, List<String> splitMessage) throws TelegramApiException {

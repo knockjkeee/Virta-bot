@@ -33,10 +33,14 @@ public class SendOperationTask implements Runnable {
 
     public void updateAttachment(Attachment attach) {
         List<Attachment> attaches = req.getAttaches();
-        if (attaches == null) {
-            attaches = new ArrayList<>();
+        List<Attachment> result = new ArrayList<>();
+        if (attaches == null && attach != null) {
+            result.add(attach);
+            req.setAttaches(result);
+        } else if (attaches != null){
+            result.addAll(attaches);
+            result.add(attach);
+            req.setAttaches(result);
         }
-        attaches.add(attach);
-        req.setAttaches(attaches);
     }
 }
