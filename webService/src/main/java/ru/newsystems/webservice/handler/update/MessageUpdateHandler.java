@@ -121,23 +121,23 @@ public class MessageUpdateHandler implements UpdateHandler {
     private void sendTicketTextMsg(Update update, TicketJ ticket) throws TelegramApiException {
         String ticketDateTime = ticket.getCreated().replaceAll("\\s+", "T");
         LocalDateTime parseTicket = LocalDateTime.parse(ticketDateTime);
-        String ticketText = "*Результат поиска:*"
-                + "\n№ __"
+        String ticketText = "<pre>Результат поиска:</pre>"
+                + "\n№ <i>"
                 + ticket.getTicketNumber()
-                + "__"
+                + "</i>"
                 + "\t\t\t"
                 + TicketState.getState(ticket.getState()).getLabel()
                 + "\t"
                 + TicketState.getState(ticket.getLock()).getLabel()
-                + "\n_От:_ \t"
+                + "\n<i>От:</i> \t"
                 + parseTicket.format(DateTimeFormatter.ofPattern("dd/MM/yyyy  HH:mm:ss"))
-                + "\n_Очередь:_ \t"
+                + "\n<i>Очередь:</i> \t"
                 + ticket.getQueue()
-                + "\n_Приоритет:_ \t"
+                + "\n<i>Приоритет:</i> \t"
                 + ticket.getPriority()
-                + "\n_Заголовок:_ \t"
+                + "\n<i>Заголовок:</i> \t"
                 + ticket.getTitle()
-                + "\n_Количество комментариев:_ "
+                + "\n<i>Количество комментариев:</i> "
                 + ticket.getArticles().size();
 
         Article article = ticket.getArticles().get(ticket.getArticles().size() - 1);
@@ -145,18 +145,18 @@ public class MessageUpdateHandler implements UpdateHandler {
         LocalDateTime parseArticle = LocalDateTime.parse(articleDatetime);
         int sizeAttach = article.getAttachments() == null ? 0 : article.getAttachments().size();
         String resultText = ticketText
-                + "\n\n*Последний комментарий:*"
-                + "\n_От:_ \t"
+                + "\n\n<pre>Последний комментарий:</pre>"
+                + "\n<i>От:</i> \t"
                 + parseArticle.format(DateTimeFormatter.ofPattern("dd/MM/yyyy  HH:mm:ss"))
-                + "\n_Заголовок:_\t"
+                + "\n<i>Заголовок:</i> \t"
                 + replaceAllBindCharacter(article.getSubject())
-                + "\n_От кого:_\t"
+                + "\n<i>От кого:</i> \t"
                 + replaceAllBindCharacter(article.getFrom())
-                + "\nКому: \t"
+                + "\n<i>Кому:</i> \t"
                 + replaceAllBindCharacter(article.getTo())
-                + "\n_Тело сообщения:_ "
+                + "\n<i>Тело сообщения:</i> "
                 + replaceAllBindCharacter(article.getBody())
-                + "\n_Количество файлов прикрепленных к комментарию:_ \t"
+                + "\n<i>Количество файлов прикрепленных к комментарию:</i> \t"
                 + sizeAttach;
 
         List<List<InlineKeyboardButton>> buttons = new ArrayList<>();
@@ -173,7 +173,7 @@ public class MessageUpdateHandler implements UpdateHandler {
         bot.execute(SendMessage.builder()
                 .chatId(String.valueOf(update.getMessage().getChatId()))
                 .text(resultText)
-                .parseMode(ParseMode.MARKDOWNV2)
+                .parseMode(ParseMode.HTML)
                 .replyToMessageId(update.getMessage().getMessageId())
                 .replyMarkup(InlineKeyboardMarkup.builder().keyboard(buttons).build())
                 .build());

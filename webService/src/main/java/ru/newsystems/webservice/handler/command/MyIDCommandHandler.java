@@ -1,7 +1,6 @@
 package ru.newsystems.webservice.handler.command;
 
 import org.springframework.stereotype.Component;
-import org.telegram.telegrambots.meta.api.methods.ParseMode;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
@@ -9,26 +8,27 @@ import ru.newsystems.basecore.integration.VirtaBot;
 import ru.newsystems.basecore.model.state.Command;
 
 @Component
-public class HelpCommandHandler implements CommandHandler {
+public class MyIDCommandHandler implements CommandHandler {
 
     private final VirtaBot bot;
 
-    public HelpCommandHandler(VirtaBot bot) {
+    public MyIDCommandHandler(VirtaBot bot) {
         this.bot = bot;
     }
 
     @Override
     public void handleCommand(Message message, String text) throws TelegramApiException {
-        bot.execute(
-                SendMessage.builder()
-                        .text("<pre>HELP</pre>\n<u>HELP</u>\n<i>HELP</i>\n<b>HELP</b>")
-                        .parseMode(ParseMode.HTML)
-                        .chatId(message.getChatId().toString())
-                        .build());
+        String txt = "<pre>Ваш id : " + message.getChatId() + "</pre>";
+
+        bot.execute(SendMessage.builder()
+                .chatId(message.getChatId().toString())
+                .parseMode("html")
+                .text(txt)
+                .build());
     }
 
     @Override
     public Command getCommand() {
-        return Command.HELP;
+        return Command.MY_ID;
     }
 }
