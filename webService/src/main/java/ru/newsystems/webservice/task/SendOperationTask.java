@@ -6,18 +6,20 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import ru.newsystems.basecore.integration.VirtaBot;
 import ru.newsystems.basecore.model.domain.Attachment;
-import ru.newsystems.basecore.model.dto.domain.RequestUpdateDTO;
+import ru.newsystems.basecore.model.dto.domain.RequestDataDTO;
 import ru.newsystems.webservice.service.RestService;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import static ru.newsystems.webservice.utils.TelegramUtil.sendCreateTicket;
 import static ru.newsystems.webservice.utils.TelegramUtil.sendNewComment;
 
 @Data
 @Builder
 public class SendOperationTask implements Runnable {
-    private RequestUpdateDTO req;
+    private RequestDataDTO req;
+    private boolean isSendComment;
     private Update update;
     private VirtaBot bot;
     private RestService restService;
@@ -25,7 +27,11 @@ public class SendOperationTask implements Runnable {
     @Override
     public void run() {
         try {
-            sendNewComment(update, req, restService, bot);
+            if (isSendComment) {
+                sendNewComment(update, req, restService, bot);
+            }else{
+                sendCreateTicket(update, req, restService, bot);
+            }
         } catch (TelegramApiException e) {
             e.printStackTrace();
         }

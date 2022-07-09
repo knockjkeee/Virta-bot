@@ -18,8 +18,8 @@ public enum Command {
     help - Help at work
     */
     MY_ID("/my_id", "Get information for me"),
-    MY_TICKET("/my_ticket", "Get my ticket by user name"),
-    CREATE_TICKET("/create_ticker", "Create new ticket"),
+    MY_TICKET("/my_ticket", "Get my open tickets"),
+    CREATE_TICKET("/create_ticket", "Create new ticket"),
     HELP("/help", "Help at work"),
     ABOUT("/about", "About me");
 

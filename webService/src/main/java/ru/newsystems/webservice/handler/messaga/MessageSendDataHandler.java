@@ -5,7 +5,7 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import ru.newsystems.basecore.integration.VirtaBot;
 import ru.newsystems.basecore.model.domain.Attachment;
-import ru.newsystems.basecore.model.dto.domain.RequestUpdateDTO;
+import ru.newsystems.basecore.model.dto.domain.RequestDataDTO;
 import ru.newsystems.basecore.model.state.MessageState;
 import ru.newsystems.webservice.service.RestService;
 import ru.newsystems.webservice.task.SendLocalRepo;
@@ -40,10 +40,12 @@ public class MessageSendDataHandler implements MessageHandler {
     public boolean handleUpdate(Update update) throws TelegramApiException {
         if (update.getMessage().getReplyToMessage() != null) {
             List<String> replyTexts = splitMessageText(update.getMessage().getReplyToMessage().getText(), "№");
-            if (replyTexts.get(0).contains(MessageState.SENDCOMMENT.getName())) {
+            boolean isSendComment = replyTexts.get(0).contains(MessageState.SENDCOMMENT.getName());
+            boolean isCreateTicket = replyTexts.get(0).contains(MessageState.CREATETICKET.getName());
+            if (isSendComment || isCreateTicket) {
                 if (update.getMessage().hasText()) {
-                    RequestUpdateDTO req = prepareReqWithMessage(replyTexts, update.getMessage().getText());
-                    prepareTaskForExecutor(update, req);
+                    RequestDataDTO req = prepareReqWithMessage(replyTexts, update.getMessage().getText());
+                    prepareTaskForExecutor(update, req, isSendComment);
                     return true;
                 }
 
@@ -56,13 +58,17 @@ public class MessageSendDataHandler implements MessageHandler {
                         prepareTaskForExecutor(update, sendUpdateDTO, task, attachment);
                         return true;
                     } else {
-                        RequestUpdateDTO req = prepareReqWithPhoto(update, replyTexts, update.getMessage().getCaption(), bot);
+                        RequestDataDTO req = prepareReqWithPhoto(update, replyTexts, update.getMessage().getCaption(), bot);
                         if ((sendUpdateDTO == null || sendUpdateDTO.getSchedule().isDone())
                                 && update.getMessage().getMediaGroupId() != null) {
-                            prepareTaskForExecutor(update, req);
+                            prepareTaskForExecutor(update, req, isSendComment);
                             return true;
                         }
-                        sendNewComment(update, req, restService, bot);
+                        if (isSendComment) {
+                            sendNewComment(update, req, restService, bot);
+                        }else{
+                            sendCreateTicket(update, req, restService, bot);
+                        }
                         return true;
                     }
                 }
@@ -76,8 +82,12 @@ public class MessageSendDataHandler implements MessageHandler {
                         prepareTaskForExecutor(update, sendUpdateDTO, task, attachment);
                         return true;
                     }
-                    RequestUpdateDTO req = prepareReqWithDocument(update, replyTexts, update.getMessage().getCaption(), bot);
-                    sendNewComment(update, req, restService, bot);
+                    RequestDataDTO req = prepareReqWithDocument(update, replyTexts, update.getMessage().getCaption(), bot);
+                    if (isSendComment) {
+                        sendNewComment(update, req, restService, bot);
+                    }else{
+                        sendCreateTicket(update, req, restService, bot);
+                    }
                     return true;
                 }
                 return false;
@@ -88,19 +98,20 @@ public class MessageSendDataHandler implements MessageHandler {
     }
 
     private void prepareTaskForExecutor(Update update, SendUpdateDTO sendUpdateDTO, SendOperationTask task, Attachment attachment) {
-        task.updateAttachmentUpdateDTO(attachment);
+        task.updateAttachment(attachment);
         ScheduledFuture<?> schedule = executor.schedule(task, DELAY_AFTER_ADD_MSG, TimeUnit.SECONDS);
         sendUpdateDTO.setSchedule(schedule);
         sendUpdateDTO.setTask(task);
         localRepo.update(update.getMessage().getDate().longValue() - 1, sendUpdateDTO);
     }
 
-    private void prepareTaskForExecutor(Update update, RequestUpdateDTO req) {
+    private void prepareTaskForExecutor(Update update, RequestDataDTO req, boolean isSendComment) {
         SendOperationTask task = SendOperationTask.builder()
-                .updateReq(req)
+                .req(req)
                 .update(update)
                 .bot(bot)
                 .restService(restService)
+                .isSendComment(isSendComment)
                 .build();
         ScheduledFuture<?> schedule = executor.schedule(task, DELAY_FOR_ADD_DOCS_OR_PIC, TimeUnit.SECONDS);
         SendUpdateDTO sendUpdateDTO = SendUpdateDTO.builder().task(task).schedule(schedule).build();

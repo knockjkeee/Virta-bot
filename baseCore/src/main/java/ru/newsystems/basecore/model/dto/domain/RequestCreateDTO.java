@@ -9,7 +9,7 @@ import java.util.List;
 
 @Data
 @RequiredArgsConstructor
-public class RequestUpdateDTO {
+public class RequestCreateDTO {
     private Long ticketNumber;
     private Article article;
     List<Attachment> attaches;

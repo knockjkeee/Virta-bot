@@ -13,8 +13,8 @@ import ru.newsystems.basecore.integration.VirtaBot;
 import ru.newsystems.basecore.model.domain.Article;
 import ru.newsystems.basecore.model.domain.Attachment;
 import ru.newsystems.basecore.model.domain.Error;
-import ru.newsystems.basecore.model.dto.domain.RequestUpdateDTO;
-import ru.newsystems.basecore.model.dto.domain.TicketUpdateDTO;
+import ru.newsystems.basecore.model.dto.domain.RequestDataDTO;
+import ru.newsystems.basecore.model.dto.domain.TicketUpdateCreateDTO;
 import ru.newsystems.basecore.model.state.ContentTypeState;
 import ru.newsystems.webservice.service.RestService;
 
@@ -61,6 +61,14 @@ public class TelegramUtil {
         }
     }
 
+    public static void receiveReqNum(Update update, VirtaBot bot, Long reqNum) throws TelegramApiException {
+        bot.execute(SendMessage.builder()
+                .text("Номер созданной заявки - " + reqNum)
+                .replyToMessageId(update.getMessage().getMessageId())
+                .chatId(update.getMessage().getChatId().toString())
+                .build());
+    }
+
     public static void sendErrorMsg(VirtaBot bot, Update update, String text, Error error) throws TelegramApiException {
         String resultText = "❗️❗❗ \n<b>ErrorCode</b>: "
                 + error.getErrorCode()
@@ -87,10 +95,21 @@ public class TelegramUtil {
         }
     }
 
-    public static void sendNewComment(Update update, RequestUpdateDTO req, RestService restService, VirtaBot bot) throws TelegramApiException {
-        Optional<TicketUpdateDTO> ticketOperationUpdate = restService.getTicketOperationUpdate(req);
+    public static void sendNewComment(Update update, RequestDataDTO req, RestService restService, VirtaBot bot) throws TelegramApiException {
+        Optional<TicketUpdateCreateDTO> ticketOperationUpdate = restService.getTicketOperationUpdate(req);
         if (ticketOperationUpdate.isPresent() && ticketOperationUpdate.get().getError() == null) {
             closeReplyKeyBoard(update, bot, true);
+        } else {
+            sendErrorMsg(bot, update, update.getMessage().getReplyToMessage().getText(), ticketOperationUpdate.get()
+                    .getError());
+        }
+    }
+
+    public static void sendCreateTicket(Update update, RequestDataDTO req, RestService restService, VirtaBot bot) throws TelegramApiException {
+        Optional<TicketUpdateCreateDTO> ticketOperationUpdate = restService.getTicketOperationCreate(req);
+        if (ticketOperationUpdate.isPresent() && ticketOperationUpdate.get().getError() == null) {
+            closeReplyKeyBoard(update, bot, true);
+            receiveReqNum(update, bot, ticketOperationUpdate.get().getTicketNumber());
         } else {
             sendErrorMsg(bot, update, update.getMessage().getReplyToMessage().getText(), ticketOperationUpdate.get()
                     .getError());
@@ -113,9 +132,9 @@ public class TelegramUtil {
     }
 
     @NotNull
-    public static RequestUpdateDTO prepareReqWithMessage(List<String> replyTexts, String body) {
-        RequestUpdateDTO req = new RequestUpdateDTO();
-        req.setTicketNumber(Long.valueOf(replyTexts.get(1)));
+    public static RequestDataDTO prepareReqWithMessage(List<String> replyTexts, String body) {
+        RequestDataDTO req = new RequestDataDTO();
+        req.setTicketNumber(replyTexts.size() > 1 ? Long.parseLong(replyTexts.get(1)) : 0);
         Article article = new Article();
         article.setBody(body);
         req.setArticle(article);
@@ -123,7 +142,7 @@ public class TelegramUtil {
     }
 
     @NotNull
-    public static RequestUpdateDTO prepareReqWithPhoto(Update update, List<String> replyTexts, String body, VirtaBot bot) throws TelegramApiException {
+    public static RequestDataDTO prepareReqWithPhoto(Update update, List<String> replyTexts, String body, VirtaBot bot) throws TelegramApiException {
         String filePath = getFilePath(update, bot);
         String base64 = getBase64(filePath, bot);
         String fileName = filePath.split("/")[1];
@@ -132,15 +151,15 @@ public class TelegramUtil {
     }
 
     @NotNull
-    public static RequestUpdateDTO prepareReqWithDocument(Update update, List<String> replyTexts, String body, VirtaBot bot) throws TelegramApiException {
+    public static RequestDataDTO prepareReqWithDocument(Update update, List<String> replyTexts, String body, VirtaBot bot) throws TelegramApiException {
         Document document = update.getMessage().getDocument();
         String base64 = prepareBase64(document.getFileId(), false, bot);
         return prepareReqWithAttachment(replyTexts, body, base64, document.getMimeType(), document.getFileName());
     }
 
     @NotNull
-    private static RequestUpdateDTO prepareReqWithAttachment(List<String> replyTexts, String body, String base64, String contentType, String fileName) {
-        RequestUpdateDTO req = prepareReqWithMessage(replyTexts, body);
+    private static RequestDataDTO prepareReqWithAttachment(List<String> replyTexts, String body, String base64, String contentType, String fileName) {
+        RequestDataDTO req = prepareReqWithMessage(replyTexts, body);
         Attachment attach = prepareAttach(base64, contentType, fileName);
         req.setAttaches(List.of(attach));
         return req;

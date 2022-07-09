@@ -9,7 +9,7 @@ import ru.newsystems.basecore.model.domain.Error;
 @Data
 @RequiredArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class TicketUpdateDTO {
+public class TicketUpdateCreateDTO {
     @JsonProperty("Error")
     private Error error;
     @JsonProperty("ArticleID")

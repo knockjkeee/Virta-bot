@@ -8,10 +8,10 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 import ru.newsystems.basecore.model.domain.Article;
-import ru.newsystems.basecore.model.dto.domain.RequestUpdateDTO;
+import ru.newsystems.basecore.model.dto.domain.RequestDataDTO;
 import ru.newsystems.basecore.model.dto.domain.TicketGetDTO;
 import ru.newsystems.basecore.model.dto.domain.TicketSearchDTO;
-import ru.newsystems.basecore.model.dto.domain.TicketUpdateDTO;
+import ru.newsystems.basecore.model.dto.domain.TicketUpdateCreateDTO;
 
 import java.util.*;
 
@@ -54,10 +54,21 @@ public class RestService {
         }
     }
 
-    public Optional<TicketUpdateDTO> getTicketOperationUpdate(RequestUpdateDTO data) {
+    public Optional<TicketUpdateCreateDTO> getTicketOperationUpdate(RequestDataDTO data) {
         String urlUpdate = getUrl("TicketUpdate?UserLogin=");
         HttpEntity<Map<String, Object>> requestEntity = getRequestHeaderTickerUpdate(data);
-        ResponseEntity<TicketUpdateDTO> response = restTemplate.exchange(urlUpdate, HttpMethod.POST, requestEntity, TicketUpdateDTO.class);
+        ResponseEntity<TicketUpdateCreateDTO> response = restTemplate.exchange(urlUpdate, HttpMethod.POST, requestEntity, TicketUpdateCreateDTO.class);
+        if (response.getStatusCode() == HttpStatus.OK) {
+            return Optional.ofNullable(response.getBody());
+        } else {
+            return Optional.empty();
+        }
+    }
+
+    public Optional<TicketUpdateCreateDTO> getTicketOperationCreate(RequestDataDTO data) {
+        String urlCreate = getUrl("TicketCreate?UserLogin=");
+        HttpEntity<Map<String, Object>> requestEntity = getRequestHeaderTickerCreate(data);
+        ResponseEntity<TicketUpdateCreateDTO> response = restTemplate.exchange(urlCreate, HttpMethod.POST, requestEntity, TicketUpdateCreateDTO.class);
         if (response.getStatusCode() == HttpStatus.OK) {
             return Optional.ofNullable(response.getBody());
         } else {
@@ -94,18 +105,12 @@ public class RestService {
         return new HttpEntity<>(map, getHttpHeaders(MediaType.APPLICATION_JSON));
     }
 
-    public HttpEntity<MultiValueMap<String, Object>> getRequestHeaderTickerSearch() {
-        MultiValueMap<String, Object> map = new LinkedMultiValueMap<>();
-        return new HttpEntity<>(map, getHttpHeaders(MediaType.APPLICATION_JSON));
-    }
-
-
-    public  HttpEntity<Map<String, Object>> getRequestHeaderTickerUpdate(RequestUpdateDTO data) {
+    public  HttpEntity<Map<String, Object>> getRequestHeaderTickerUpdate(RequestDataDTO data) {
         Map<String, Object> map = new HashMap<>();
         Map<String, Object> arc = new HashMap<>();
 
         arc.put("ContentType", "text/plain; charset=utf8");
-        arc.put("Subject", "Добавление комментария с помощью telegram bot");
+        arc.put("Subject", "Комментарий добавлен с помощью telegram bot");
         arc.put("Body", data.getArticle().getBody());
 
         map.put("TicketNumber", data.getTicketNumber());
@@ -121,7 +126,6 @@ public class RestService {
                 attach.put("ContentType", e.getContentType());
                 attach.put("Filename", e.getFilename());
                 obj.add(attach);
-//                map.put("Attachment", attach);
             });
             map.put("Attachment", obj);
         }
@@ -129,9 +133,48 @@ public class RestService {
     }
 
 
+    public  HttpEntity<Map<String, Object>> getRequestHeaderTickerCreate(RequestDataDTO data) {
+        Map<String, Object> map = new HashMap<>();
+        Map<String, Object> arc = new HashMap<>();
+        Map<String, Object> ticket = new HashMap<>();
+
+        ticket.put("QueueID", 7);
+        ticket.put("Priority", "3 normal");
+        ticket.put("CustomerUser", "PRc");
+        ticket.put("Title", "Тикет создан с помощью telegram bot");
+        ticket.put("State", "open");
+        ticket.put("Type", "Unclassified");
+        map.put("Ticket", ticket);
+
+        arc.put("ContentType", "text/plain; charset=utf8");
+        arc.put("Subject", "Комментарий добавлен с помощью telegram bot");
+        arc.put("Body", data.getArticle().getBody());
+        map.put("Article", arc);
+//
+        if (data.getAttaches() != null && data.getAttaches().size() > 0) {
+            List<Object> obj = new ArrayList<>();
+            data.getAttaches().forEach(e -> {
+                Map<String, Object> attach = new HashMap<>();
+                attach.put("Content", e.getContent());
+                attach.put("ContentType", e.getContentType());
+                attach.put("Filename", e.getFilename());
+                obj.add(attach);
+            });
+            map.put("Attachment", obj);
+        }
+        return new HttpEntity<>(map, getHttpHeaders(MediaType.APPLICATION_JSON));
+    }
+
+
+
     public HttpEntity<MultiValueMap<String, Object>> getRequestHeaderTickerSearch(List<Long> listTicketNumbers) {
         MultiValueMap<String, Object> map = new LinkedMultiValueMap<>();
         listTicketNumbers.forEach(e -> map.add("TicketNumber", e));
+        return new HttpEntity<>(map, getHttpHeaders(MediaType.APPLICATION_JSON));
+    }
+
+    public HttpEntity<MultiValueMap<String, Object>> getRequestHeaderTickerSearch() {
+        MultiValueMap<String, Object> map = new LinkedMultiValueMap<>();
         return new HttpEntity<>(map, getHttpHeaders(MediaType.APPLICATION_JSON));
     }
 
@@ -146,4 +189,5 @@ public class RestService {
     private String getUrl(String operation) {
         return baseUrl + path + operation + login + "&Password=" + password;
     }
+
 }

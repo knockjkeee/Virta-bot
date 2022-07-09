@@ -1,12 +1,12 @@
 package ru.newsystems.basecore.model.state;
 
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 
 @Getter
 public enum MessageState {
     SHOW("Показать"),
     EXIT("Закрыть"),
+    CREATETICKET("Создать заявку"),
     SENDCOMMENT("Отправить сообщение"),
     DOWLOADFILE("Выгрузить документы из последнего сообщения"),
     NONE("Empty");
