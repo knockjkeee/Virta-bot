@@ -113,35 +113,34 @@ public class TelegramUtil {
     }
 
     @NotNull
-    public static RequestUpdateDTO prepareReqWithMessage(List<String> texts, List<String> messages) {
+    public static RequestUpdateDTO prepareReqWithMessage(List<String> replyTexts, String body) {
         RequestUpdateDTO req = new RequestUpdateDTO();
-        req.setTicketNumber(Long.valueOf(texts.get(1)));
+        req.setTicketNumber(Long.valueOf(replyTexts.get(1)));
         Article article = new Article();
-        article.setSubject(messages.get(0));
-        article.setBody(messages.get(1));
+        article.setBody(body);
         req.setArticle(article);
         return req;
     }
 
     @NotNull
-    public static RequestUpdateDTO prepareReqWithPhoto(Update update, List<String> texts, List<String> messages, VirtaBot bot) throws TelegramApiException {
+    public static RequestUpdateDTO prepareReqWithPhoto(Update update, List<String> replyTexts, String body, VirtaBot bot) throws TelegramApiException {
         String filePath = getFilePath(update, bot);
         String base64 = getBase64(filePath, bot);
         String fileName = filePath.split("/")[1];
         String contentType  = ContentTypeState.getState(fileName.split("\\.")[1]).getContent();
-        return prepareReqWithAttachment(texts, messages, base64, contentType, fileName);
+        return prepareReqWithAttachment(replyTexts, body, base64, contentType, fileName);
     }
 
     @NotNull
-    public static RequestUpdateDTO prepareReqWithDocument(Update update, List<String> texts, List<String> messages, VirtaBot bot) throws TelegramApiException {
+    public static RequestUpdateDTO prepareReqWithDocument(Update update, List<String> replyTexts, String body, VirtaBot bot) throws TelegramApiException {
         Document document = update.getMessage().getDocument();
         String base64 = prepareBase64(document.getFileId(), false, bot);
-        return prepareReqWithAttachment(texts, messages, base64, document.getMimeType(), document.getFileName());
+        return prepareReqWithAttachment(replyTexts, body, base64, document.getMimeType(), document.getFileName());
     }
 
     @NotNull
-    private static RequestUpdateDTO prepareReqWithAttachment(List<String> texts, List<String> messages, String base64, String contentType, String fileName) {
-        RequestUpdateDTO req = prepareReqWithMessage(texts, messages);
+    private static RequestUpdateDTO prepareReqWithAttachment(List<String> replyTexts, String body, String base64, String contentType, String fileName) {
+        RequestUpdateDTO req = prepareReqWithMessage(replyTexts, body);
         Attachment attach = prepareAttach(base64, contentType, fileName);
         req.setAttaches(List.of(attach));
         return req;

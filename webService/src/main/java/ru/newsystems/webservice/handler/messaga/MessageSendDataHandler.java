@@ -20,16 +20,16 @@ import java.util.concurrent.TimeUnit;
 import static ru.newsystems.webservice.utils.TelegramUtil.*;
 
 @Component
-public class MessageSendCommentHandler implements MessageHandler {
+public class MessageSendDataHandler implements MessageHandler {
 
     public static final int DELAY_FOR_ADD_DOCS_OR_PIC = 5;
-    public static final int DELAY_FOR_AFTER_ADD_MSG = 3;
+    public static final int DELAY_AFTER_ADD_MSG = 3;
     private final SendLocalRepo localRepo;
     private final ScheduledExecutorService executor;
     private final RestService restService;
     private final VirtaBot bot;
 
-    public MessageSendCommentHandler(SendLocalRepo localRepo, ScheduledExecutorService executor, RestService restService, VirtaBot bot) {
+    public MessageSendDataHandler(SendLocalRepo localRepo, ScheduledExecutorService executor, RestService restService, VirtaBot bot) {
         this.localRepo = localRepo;
         this.executor = executor;
         this.restService = restService;
@@ -42,9 +42,7 @@ public class MessageSendCommentHandler implements MessageHandler {
             List<String> replyTexts = splitMessageText(update.getMessage().getReplyToMessage().getText(), "№");
             if (replyTexts.get(0).contains(MessageState.SENDCOMMENT.getName())) {
                 if (update.getMessage().hasText()) {
-                    List<String> messages = splitMessageText(update.getMessage().getText(), "#");
-                    if (checkCorrectlySendFormatSubjectMessage(update, messages)) return true;
-                    RequestUpdateDTO req = prepareReqWithMessage(replyTexts, messages);
+                    RequestUpdateDTO req = prepareReqWithMessage(replyTexts, update.getMessage().getText());
                     prepareTaskForExecutor(update, req);
                     return true;
                 }
@@ -58,9 +56,7 @@ public class MessageSendCommentHandler implements MessageHandler {
                         prepareTaskForExecutor(update, sendUpdateDTO, task, attachment);
                         return true;
                     } else {
-                        List<String> messages = splitMessageText(update.getMessage().getCaption(), "#");
-                        if (checkCorrectlySendFormatSubjectMessage(update, messages)) return true;
-                        RequestUpdateDTO req = prepareReqWithPhoto(update, replyTexts, messages, bot);
+                        RequestUpdateDTO req = prepareReqWithPhoto(update, replyTexts, update.getMessage().getCaption(), bot);
                         if ((sendUpdateDTO == null || sendUpdateDTO.getSchedule().isDone())
                                 && update.getMessage().getMediaGroupId() != null) {
                             prepareTaskForExecutor(update, req);
@@ -80,10 +76,7 @@ public class MessageSendCommentHandler implements MessageHandler {
                         prepareTaskForExecutor(update, sendUpdateDTO, task, attachment);
                         return true;
                     }
-
-                    List<String> messages = splitMessageText(update.getMessage().getCaption(), "#");
-                    if (checkCorrectlySendFormatSubjectMessage(update, messages)) return true;
-                    RequestUpdateDTO req = prepareReqWithDocument(update, replyTexts, messages, bot);
+                    RequestUpdateDTO req = prepareReqWithDocument(update, replyTexts, update.getMessage().getCaption(), bot);
                     sendNewComment(update, req, restService, bot);
                     return true;
                 }
@@ -95,8 +88,8 @@ public class MessageSendCommentHandler implements MessageHandler {
     }
 
     private void prepareTaskForExecutor(Update update, SendUpdateDTO sendUpdateDTO, SendOperationTask task, Attachment attachment) {
-        task.updateAttachment(attachment);
-        ScheduledFuture<?> schedule = executor.schedule(task, DELAY_FOR_AFTER_ADD_MSG, TimeUnit.SECONDS);
+        task.updateAttachmentUpdateDTO(attachment);
+        ScheduledFuture<?> schedule = executor.schedule(task, DELAY_AFTER_ADD_MSG, TimeUnit.SECONDS);
         sendUpdateDTO.setSchedule(schedule);
         sendUpdateDTO.setTask(task);
         localRepo.update(update.getMessage().getDate().longValue() - 1, sendUpdateDTO);
@@ -104,7 +97,7 @@ public class MessageSendCommentHandler implements MessageHandler {
 
     private void prepareTaskForExecutor(Update update, RequestUpdateDTO req) {
         SendOperationTask task = SendOperationTask.builder()
-                .req(req)
+                .updateReq(req)
                 .update(update)
                 .bot(bot)
                 .restService(restService)

@@ -105,7 +105,7 @@ public class RestService {
         Map<String, Object> arc = new HashMap<>();
 
         arc.put("ContentType", "text/plain; charset=utf8");
-        arc.put("Subject", data.getArticle().getSubject());
+        arc.put("Subject", "Добавление комментария с помощью telegram bot");
         arc.put("Body", data.getArticle().getBody());
 
         map.put("TicketNumber", data.getTicketNumber());

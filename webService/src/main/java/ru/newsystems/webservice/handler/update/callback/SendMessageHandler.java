@@ -1,8 +1,6 @@
 package ru.newsystems.webservice.handler.update.callback;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.telegram.telegrambots.meta.api.methods.AnswerCallbackQuery;
 import org.telegram.telegrambots.meta.api.methods.ParseMode;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
@@ -15,7 +13,12 @@ import ru.newsystems.basecore.model.state.SerializableInlineType;
 
 @Component
 public class SendMessageHandler extends CallbackUpdateHandler<SendCommentDTO> {
-  @Autowired private VirtaBot bot;
+
+  private final VirtaBot bot;
+
+  public SendMessageHandler(VirtaBot bot) {
+    this.bot = bot;
+  }
 
   @Override
   protected Class<SendCommentDTO> getDtoType() {
@@ -29,7 +32,6 @@ public class SendMessageHandler extends CallbackUpdateHandler<SendCommentDTO> {
 
   @Override
   protected void handleCallback(Update update, SendCommentDTO dto) throws TelegramApiException {
-//    String text = MessageState.SENDCOMMENT.getName() + " по заявке №" + update.getCallbackQuery().getMessage().getReplyToMessage().getText() + "\n<b>Форма подачи</b>: Заголовок сообщения # Тело сообщения";
     String text = MessageState.SENDCOMMENT.getName() + " по заявке №" + update.getCallbackQuery().getMessage().getReplyToMessage().getText();
     bot.execute(
             SendMessage.builder()
@@ -39,11 +41,11 @@ public class SendMessageHandler extends CallbackUpdateHandler<SendCommentDTO> {
                     .parseMode(ParseMode.HTML)
                     .replyMarkup(ForceReplyKeyboard.builder().forceReply(true).build())
                     .build());
-    bot.execute(AnswerCallbackQuery.builder()
-            .cacheTime(10)
-            .text("\t⚠️ Форма подачи: ⚠️\n\n<Заголовок> # <Сообщение>\n\nЗагрузка документов опциональна")
-            .showAlert(true)
-            .callbackQueryId(update.getCallbackQuery().getId())
-            .build());
+//    bot.execute(AnswerCallbackQuery.builder()
+//            .cacheTime(10)
+//            .text("\t⚠️ Форма подачи: ⚠️\n\n<Заголовок> # <Сообщение>\n\nЗагрузка документов опциональна")
+//            .showAlert(true)
+//            .callbackQueryId(update.getCallbackQuery().getId())
+//            .build());
   }
 }

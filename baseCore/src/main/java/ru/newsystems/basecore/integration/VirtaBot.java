@@ -24,7 +24,7 @@ public class VirtaBot extends TelegramLongPollingBot implements Customer {
 
     @Override
     public String getBotToken() {
-        return System.getenv("token");
+        return System.getenv("tokenBotApi");
     }
 
     @Override
