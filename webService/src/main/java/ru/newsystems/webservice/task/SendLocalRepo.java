@@ -8,9 +8,9 @@ import java.util.concurrent.ConcurrentMap;
 @Component
 public class SendLocalRepo {
 
-    ConcurrentMap<Long, SendUpdateDTO> repo = new ConcurrentHashMap<>();
+    ConcurrentMap<Long, SendDataDTO> repo = new ConcurrentHashMap<>();
 
-    public void add(Long id, SendUpdateDTO data) {
+    public void add(Long id, SendDataDTO data) {
         repo.put(id, data);
     }
 
@@ -18,8 +18,8 @@ public class SendLocalRepo {
         repo.remove(id);
     }
 
-    public void update(Long id, SendUpdateDTO data) {
-        SendUpdateDTO old = repo.get(id);
+    public void update(Long id, SendDataDTO data) {
+        SendDataDTO old = repo.get(id);
         if (old == null) {
             repo.put(id, data);
         } else {
@@ -27,7 +27,7 @@ public class SendLocalRepo {
         }
     }
 
-    public SendUpdateDTO get(Long id) {
+    public SendDataDTO get(Long id) {
         return repo.get(id);
     }
 

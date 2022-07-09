@@ -7,7 +7,7 @@ import ru.newsystems.basecore.integration.VirtaBot;
 import ru.newsystems.basecore.model.state.MessageState;
 import ru.newsystems.basecore.repo.local.MessageLocalRepo;
 
-import static ru.newsystems.webservice.utils.TelegramUtil.closeReplyKeyBoard;
+import static ru.newsystems.webservice.utils.TelegramUtil.resultOperationToChat;
 
 
 @Component
@@ -26,7 +26,7 @@ public class MessageExitHandler implements MessageHandler{
         String text = update.getMessage().getText();
         if (text == null) return false;
         if (MessageState.getState(text).equals(MessageState.EXIT)) {
-            closeReplyKeyBoard(update, bot, true);
+            resultOperationToChat(update, bot, true);
             localRepo.remove(update.getMessage().getChatId());
             return true;
         } else {

@@ -7,7 +7,7 @@ import java.util.concurrent.ScheduledFuture;
 
 @Data
 @Builder
-public class SendUpdateDTO {
+public class SendDataDTO {
     private ScheduledFuture<?> schedule;
     private SendOperationTask task;
 

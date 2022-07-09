@@ -18,7 +18,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.List;
 
-import static ru.newsystems.webservice.utils.TelegramUtil.closeReplyKeyBoard;
+import static ru.newsystems.webservice.utils.TelegramUtil.resultOperationToChat;
 
 @Component
 public class MessageDownloadFileHandler implements MessageHandler {
@@ -50,9 +50,9 @@ public class MessageDownloadFileHandler implements MessageHandler {
                         ex.printStackTrace();
                     }
                 });
-                closeReplyKeyBoard(update, bot, true);
+                resultOperationToChat(update, bot, true);
             } else {
-                closeReplyKeyBoard(update, bot, false);
+                resultOperationToChat(update, bot, false);
             }
             return true;
         } else {

@@ -10,7 +10,6 @@ import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import ru.newsystems.basecore.integration.VirtaBot;
 import ru.newsystems.basecore.integration.parser.CommandParser;
@@ -132,8 +131,6 @@ public class MessageUpdateHandler implements UpdateHandler {
                 + TicketState.getState(ticket.getLock()).getLabel()
                 + "\n_От:_ \t"
                 + parseTicket.format(DateTimeFormatter.ofPattern("dd/MM/yyyy  HH:mm:ss"))
-//                + "\n_Время создания:_ \t"
-//                + parseTicket.format(DateTimeFormatter.ofPattern("HH:mm:ss"))
                 + "\n_Очередь:_ \t"
                 + ticket.getQueue()
                 + "\n_Приоритет:_ \t"
@@ -151,8 +148,6 @@ public class MessageUpdateHandler implements UpdateHandler {
                 + "\n\n*Последний комментарий:*"
                 + "\n_От:_ \t"
                 + parseArticle.format(DateTimeFormatter.ofPattern("dd/MM/yyyy  HH:mm:ss"))
-//                + "\n_Время создания:_\t"
-//                + parseArticle.format(DateTimeFormatter.ofPattern("HH:mm:ss"))
                 + "\n_Заголовок:_\t"
                 + replaceAllBindCharacter(article.getSubject())
                 + "\n_От кого:_\t"
@@ -163,13 +158,6 @@ public class MessageUpdateHandler implements UpdateHandler {
                 + replaceAllBindCharacter(article.getBody())
                 + "\n_Количество файлов прикрепленных к комментарию:_ \t"
                 + sizeAttach;
-
-        KeyboardRow rowText = new KeyboardRow();
-        KeyboardRow rowRequest = new KeyboardRow();
-        rowText.add(MessageState.SENDCOMMENT.getName());
-        rowText.add(MessageState.DOWLOADFILE.getName());
-        rowRequest.add(MessageState.EXIT.getName());
-
 
         List<List<InlineKeyboardButton>> buttons = new ArrayList<>();
 
@@ -187,13 +175,6 @@ public class MessageUpdateHandler implements UpdateHandler {
                 .text(resultText)
                 .parseMode(ParseMode.MARKDOWNV2)
                 .replyToMessageId(update.getMessage().getMessageId())
-//                .allowSendingWithoutReply(true)
-//                .replyMarkup(ReplyKeyboardMarkup.builder()
-//                        .resizeKeyboard(true)
-//                        .selective(true)
-//                        .keyboardRow(rowText)
-//                        .keyboardRow(rowRequest)
-//                        .build())
                 .replyMarkup(InlineKeyboardMarkup.builder().keyboard(buttons).build())
                 .build());
     }

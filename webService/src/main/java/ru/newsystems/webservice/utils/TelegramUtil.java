@@ -43,7 +43,7 @@ public class TelegramUtil {
         return message;
     }
 
-    public static void closeReplyKeyBoard(Update update, VirtaBot bot, boolean isSuccess) throws TelegramApiException {
+    public static void resultOperationToChat(Update update, VirtaBot bot, boolean isSuccess) throws TelegramApiException {
         String text = isSuccess ? "✅ Выполнено" : "⛔️ В формате \"Заголовок/Сообщение\" ошибка, проверьте рекомендации";
         if (update.hasCallbackQuery()) {
             bot.execute(SendMessage.builder()
@@ -98,7 +98,7 @@ public class TelegramUtil {
     public static void sendNewComment(Update update, RequestDataDTO req, RestService restService, VirtaBot bot) throws TelegramApiException {
         Optional<TicketUpdateCreateDTO> ticketOperationUpdate = restService.getTicketOperationUpdate(req);
         if (ticketOperationUpdate.isPresent() && ticketOperationUpdate.get().getError() == null) {
-            closeReplyKeyBoard(update, bot, true);
+            resultOperationToChat(update, bot, true);
         } else {
             sendErrorMsg(bot, update, update.getMessage().getReplyToMessage().getText(), ticketOperationUpdate.get()
                     .getError());
@@ -108,7 +108,7 @@ public class TelegramUtil {
     public static void sendCreateTicket(Update update, RequestDataDTO req, RestService restService, VirtaBot bot) throws TelegramApiException {
         Optional<TicketUpdateCreateDTO> ticketOperationUpdate = restService.getTicketOperationCreate(req);
         if (ticketOperationUpdate.isPresent() && ticketOperationUpdate.get().getError() == null) {
-            closeReplyKeyBoard(update, bot, true);
+            resultOperationToChat(update, bot, true);
             receiveReqNum(update, bot, ticketOperationUpdate.get().getTicketNumber());
         } else {
             sendErrorMsg(bot, update, update.getMessage().getReplyToMessage().getText(), ticketOperationUpdate.get()
