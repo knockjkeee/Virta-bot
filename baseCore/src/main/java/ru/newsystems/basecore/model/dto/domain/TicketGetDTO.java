@@ -17,4 +17,7 @@ public class TicketGetDTO {
     private Error error;
     @JsonProperty("Ticket")
     private List<TicketJ> tickets;
+
+    private String currentTickerNumber;
+    private String currentArticle;
 }

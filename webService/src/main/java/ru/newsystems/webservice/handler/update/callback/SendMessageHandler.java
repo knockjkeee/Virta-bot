@@ -7,12 +7,12 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ForceReplyKeyboard;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import ru.newsystems.basecore.integration.VirtaBot;
-import ru.newsystems.basecore.model.dto.callback.SendCommentDTO;
+import ru.newsystems.basecore.model.dto.callback.SendDataDTO;
 import ru.newsystems.basecore.model.state.MessageState;
 import ru.newsystems.basecore.model.state.SerializableInlineType;
 
 @Component
-public class SendMessageHandler extends CallbackUpdateHandler<SendCommentDTO> {
+public class SendMessageHandler extends CallbackUpdateHandler<SendDataDTO> {
 
   private final VirtaBot bot;
 
@@ -21,8 +21,8 @@ public class SendMessageHandler extends CallbackUpdateHandler<SendCommentDTO> {
   }
 
   @Override
-  protected Class<SendCommentDTO> getDtoType() {
-    return SendCommentDTO.class;
+  protected Class<SendDataDTO> getDtoType() {
+    return SendDataDTO.class;
   }
 
   @Override
@@ -31,7 +31,7 @@ public class SendMessageHandler extends CallbackUpdateHandler<SendCommentDTO> {
   }
 
   @Override
-  protected void handleCallback(Update update, SendCommentDTO dto) throws TelegramApiException {
+  protected void handleCallback(Update update, SendDataDTO dto) throws TelegramApiException {
     String text = MessageState.SENDCOMMENT.getName() + " по заявке №" + dto.getMessageId();
     bot.execute(
             SendMessage.builder()

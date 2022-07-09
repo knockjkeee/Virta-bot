@@ -18,7 +18,7 @@ import ru.newsystems.basecore.model.domain.TicketJ;
 import ru.newsystems.basecore.model.dto.MessageGetDTO;
 import ru.newsystems.basecore.model.dto.ParseDTO;
 import ru.newsystems.basecore.model.dto.callback.DownloadFilesDTO;
-import ru.newsystems.basecore.model.dto.callback.SendCommentDTO;
+import ru.newsystems.basecore.model.dto.callback.SendDataDTO;
 import ru.newsystems.basecore.model.dto.domain.TicketGetDTO;
 import ru.newsystems.basecore.model.dto.domain.TicketSearchDTO;
 import ru.newsystems.basecore.model.state.MessageState;
@@ -163,7 +163,7 @@ public class MessageUpdateHandler implements UpdateHandler {
 
         buttons.add(List.of(InlineKeyboardButton.builder()
                 .text("Отправить комментарий")
-                .callbackData(StringUtil.serialize(new SendCommentDTO(ticket.getTicketNumber())))
+                .callbackData(StringUtil.serialize(new SendDataDTO(ticket.getTicketNumber())))
                 .build()));
         buttons.add(List.of(InlineKeyboardButton.builder()
                 .text("Выгрузить документы")
