@@ -130,7 +130,7 @@ public class MessageUpdateHandler implements UpdateHandler {
                 + "\t"
                 + TicketState.getState(ticket.getLock()).getLabel()
                 + "\n<i>От:</i> \t"
-                + parseTicket.format(DateTimeFormatter.ofPattern("dd/MM/yyyy  HH:mm:ss"))
+                + parseTicket.format(DateTimeFormatter.ofPattern("dd.MM.yyyy  HH:mm:ss"))
                 + "\n<i>Очередь:</i> \t"
                 + ticket.getQueue()
                 + "\n<i>Приоритет:</i> \t"
@@ -140,22 +140,22 @@ public class MessageUpdateHandler implements UpdateHandler {
                 + "\n<i>Количество комментариев:</i> "
                 + ticket.getArticles().size();
 
-        Article article = ticket.getArticles().get(ticket.getArticles().size() - 1);
-        String articleDatetime = article.getCreateTime().replaceAll("\\s+", "T");
+        Article lastArticle = ticket.getArticles().get(ticket.getArticles().size() - 1);
+        String articleDatetime = lastArticle.getCreateTime().replaceAll("\\s+", "T");
         LocalDateTime parseArticle = LocalDateTime.parse(articleDatetime);
-        int sizeAttach = article.getAttachments() == null ? 0 : article.getAttachments().size();
+        int sizeAttach = lastArticle.getAttachments() == null ? 0 : lastArticle.getAttachments().size();
         String resultText = ticketText
                 + "\n\n<pre>Последний комментарий:</pre>"
                 + "\n<i>От:</i> \t"
-                + parseArticle.format(DateTimeFormatter.ofPattern("dd/MM/yyyy  HH:mm:ss"))
+                + parseArticle.format(DateTimeFormatter.ofPattern("dd.MM.yyyy  HH:mm:ss"))
                 + "\n<i>Заголовок:</i> \t"
-                + replaceAllBindCharacter(article.getSubject())
+                + lastArticle.getSubject()
                 + "\n<i>От кого:</i> \t"
-                + replaceAllBindCharacter(article.getFrom())
+                + lastArticle.getFrom()
                 + "\n<i>Кому:</i> \t"
-                + replaceAllBindCharacter(article.getTo())
+                + lastArticle.getTo()
                 + "\n<i>Тело сообщения:</i> "
-                + replaceAllBindCharacter(article.getBody())
+                + lastArticle.getBody()
                 + "\n<i>Количество файлов прикрепленных к комментарию:</i> \t"
                 + sizeAttach;
 
@@ -163,11 +163,11 @@ public class MessageUpdateHandler implements UpdateHandler {
 
         buttons.add(List.of(InlineKeyboardButton.builder()
                 .text("Отправить комментарий")
-                .callbackData(StringUtil.serialize(new SendCommentDTO("Отправить комментарий", true)))
+                .callbackData(StringUtil.serialize(new SendCommentDTO(ticket.getTicketNumber())))
                 .build()));
         buttons.add(List.of(InlineKeyboardButton.builder()
                 .text("Выгрузить документы")
-                .callbackData(StringUtil.serialize(new DownloadFilesDTO("Выгрузить документы", false)))
+                .callbackData(StringUtil.serialize(new DownloadFilesDTO(ticket.getTicketNumber())))
                 .build()));
 
         bot.execute(SendMessage.builder()
@@ -177,17 +177,6 @@ public class MessageUpdateHandler implements UpdateHandler {
                 .replyToMessageId(update.getMessage().getMessageId())
                 .replyMarkup(InlineKeyboardMarkup.builder().keyboard(buttons).build())
                 .build());
-    }
-
-    private String replaceAllBindCharacter(String text) {
-        return text.replaceAll("#", "/")
-                .replaceAll("]", "/")
-                .replace('[', '/')
-                .replaceAll("-", "/")
-                .replaceAll("\\.", "")
-                .replaceAll(">", "/")
-                .replace("(", "/")
-                .replace(")", "/");
     }
 
     private void sendExceptionMsg(Update update, String text, String service) throws TelegramApiException {

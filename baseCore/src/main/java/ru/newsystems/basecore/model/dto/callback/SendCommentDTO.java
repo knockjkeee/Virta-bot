@@ -9,18 +9,14 @@ import ru.newsystems.basecore.model.state.SerializableInlineType;
 @Setter
 public class SendCommentDTO extends SerializableInlineObject {
   @JsonProperty("m")
-  private String message;
-
-  @JsonProperty("f")
-  private boolean fullMode;
+  private String messageId;
 
   public SendCommentDTO() {
     super(SerializableInlineType.SEND_COMMENT);
   }
 
-  public SendCommentDTO(String message, boolean fullMode) {
+  public SendCommentDTO(String messageId) {
     this();
-    this.message = message;
-    this.fullMode = fullMode;
+    this.messageId = messageId;
   }
 }

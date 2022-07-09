@@ -32,7 +32,7 @@ public class SendMessageHandler extends CallbackUpdateHandler<SendCommentDTO> {
 
   @Override
   protected void handleCallback(Update update, SendCommentDTO dto) throws TelegramApiException {
-    String text = MessageState.SENDCOMMENT.getName() + " по заявке №" + update.getCallbackQuery().getMessage().getReplyToMessage().getText();
+    String text = MessageState.SENDCOMMENT.getName() + " по заявке №" + dto.getMessageId();
     bot.execute(
             SendMessage.builder()
                     .text(text)

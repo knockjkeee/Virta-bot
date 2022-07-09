@@ -51,7 +51,7 @@ public class DownloadFilesHandler extends CallbackUpdateHandler<DownloadFilesDTO
         TicketJ ticket = localRepo.get(id).getTicket();
         List<Attachment> attachments = ticket.getArticles().get(ticket.getArticles().size() - 1).getAttachments();
         if (attachments == null) {
-            String text = "⛔️ Файлы для скачивания отсутсвуют в последнем комментарии.";
+            String text = "⛔️ Файлы для скачивания отсутствуют в последнем комментарии.";
             bot.execute(SendMessage.builder()
                     .text(text)
                     .replyToMessageId(update.getCallbackQuery().getMessage().getMessageId())

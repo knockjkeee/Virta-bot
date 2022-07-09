@@ -9,18 +9,14 @@ import ru.newsystems.basecore.model.state.SerializableInlineType;
 @Setter
 public class DownloadFilesDTO extends SerializableInlineObject {
   @JsonProperty("m")
-  private String message;
-
-  @JsonProperty("f")
-  private boolean fullMode;
+  private String messageId;
 
   public DownloadFilesDTO() {
     super(SerializableInlineType.DOWNLOAD);
   }
 
-  public DownloadFilesDTO(String message, boolean fullMode) {
+  public DownloadFilesDTO(String messageId) {
     this();
-    this.message = message;
-    this.fullMode = fullMode;
+    this.messageId = messageId;
   }
 }
