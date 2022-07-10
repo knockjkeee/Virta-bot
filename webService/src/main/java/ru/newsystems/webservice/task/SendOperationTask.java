@@ -12,8 +12,8 @@ import ru.newsystems.webservice.service.RestService;
 import java.util.ArrayList;
 import java.util.List;
 
-import static ru.newsystems.webservice.utils.TelegramUtil.sendCreateTicket;
-import static ru.newsystems.webservice.utils.TelegramUtil.sendNewComment;
+import static ru.newsystems.webservice.utils.Telegram.Action.sendCreateTicket;
+import static ru.newsystems.webservice.utils.Telegram.Action.sendNewComment;
 
 @Data
 @Builder

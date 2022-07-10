@@ -7,24 +7,29 @@ import ru.newsystems.basecore.model.state.SerializableInlineType;
 
 @Getter
 @Setter
-public class TicketViewDTO extends SerializableInlineObject {
+public class TicketsViewDTO extends SerializableInlineObject {
   @JsonProperty("m")
-  private String messageId;
+  private Long messageId;
 
   @JsonProperty("s")
   private int size;
 
   @JsonProperty("c")
-  private int currentItem;
+  private int page;
 
-  public TicketViewDTO() {
-    super(SerializableInlineType.TICKET_VIEW);
+  @JsonProperty("h")
+  private boolean isHome;
+
+
+  public TicketsViewDTO() {
+    super(SerializableInlineType.TICKETS_VIEW);
   }
 
-  public TicketViewDTO(String messageId, int currentItem, int size ) {
+  public TicketsViewDTO(Long messageId, int page, int size, boolean isHome ) {
     this();
     this.messageId = messageId;
     this.size = size;
-    this.currentItem = currentItem;
+    this.page = page;
+    this.isHome = isHome;
   }
 }

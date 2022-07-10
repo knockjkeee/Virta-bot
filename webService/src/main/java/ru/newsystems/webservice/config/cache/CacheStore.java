@@ -28,4 +28,12 @@ public class CacheStore<T> {
                     + " Cache with Key = " + key);
         }
     }
+
+    public void update(Long key, T value) {
+        T t = get(key);
+        if (t != null) {
+            cache.invalidate(key);
+        }
+        add(key, value);
+    }
 }

@@ -1,20 +1,31 @@
 package ru.newsystems.basecore.model.state;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import java.util.Arrays;
 import java.util.Optional;
 
 @Getter
-@AllArgsConstructor
 public enum ReplyKeyboardButton {
-    HOME("Home \uD83C\uDFE1"),
-    SETTING("Settings \uD83D\uDEE0"),
-    INFO("Info \uD83D\uDCD6"),
-    STATISTIC("Statistic \uD83D\uDCCA");
+    HOME("Домой \uD83C\uDFE0"),
+    BACK("◀️ Назад"),
+    TO("Дальше ▶️"),
+    NONE("???");
 
-    private final String label;
+    private String label;
+
+    ReplyKeyboardButton(String label) {
+        this.label = label;
+    }
+
+    public static ReplyKeyboardButton getState(String label) {
+        return switch (label) {
+            case "Домой" -> HOME;
+            case "Назад" -> BACK;
+            case "Дальше" -> TO;
+            default -> NONE;
+        };
+    }
 
     public static Optional<ReplyKeyboardButton> parse(String name) {
         return Arrays.stream(values())

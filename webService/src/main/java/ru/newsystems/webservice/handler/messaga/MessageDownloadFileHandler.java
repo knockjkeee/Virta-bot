@@ -18,7 +18,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.List;
 
-import static ru.newsystems.webservice.utils.TelegramUtil.resultOperationToChat;
+import static ru.newsystems.webservice.utils.Telegram.Notification.resultOperationToChat;
 
 @Component
 public class MessageDownloadFileHandler implements MessageHandler {

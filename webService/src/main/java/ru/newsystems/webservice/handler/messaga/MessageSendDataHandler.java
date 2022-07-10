@@ -8,16 +8,19 @@ import ru.newsystems.basecore.model.domain.Attachment;
 import ru.newsystems.basecore.model.dto.domain.RequestDataDTO;
 import ru.newsystems.basecore.model.state.MessageState;
 import ru.newsystems.webservice.service.RestService;
+import ru.newsystems.webservice.task.SendDataDTO;
 import ru.newsystems.webservice.task.SendLocalRepo;
 import ru.newsystems.webservice.task.SendOperationTask;
-import ru.newsystems.webservice.task.SendDataDTO;
 
 import java.util.List;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
-import static ru.newsystems.webservice.utils.TelegramUtil.*;
+import static ru.newsystems.webservice.utils.Telegram.Action.sendCreateTicket;
+import static ru.newsystems.webservice.utils.Telegram.Action.sendNewComment;
+import static ru.newsystems.webservice.utils.Telegram.FormattedData.*;
+import static ru.newsystems.webservice.utils.Telegram.Notification.resultOperationToChat;
 
 @Component
 public class MessageSendDataHandler implements MessageHandler {

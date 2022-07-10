@@ -7,7 +7,7 @@ import ru.newsystems.basecore.integration.VirtaBot;
 import ru.newsystems.basecore.model.state.MessageState;
 import ru.newsystems.basecore.repo.local.MessageLocalRepo;
 
-import static ru.newsystems.webservice.utils.TelegramUtil.resultOperationToChat;
+import static ru.newsystems.webservice.utils.Telegram.Notification.resultOperationToChat;
 
 
 @Component

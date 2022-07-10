@@ -8,22 +8,17 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMa
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import ru.newsystems.basecore.integration.VirtaBot;
-import ru.newsystems.basecore.model.domain.TicketJ;
-import ru.newsystems.basecore.model.dto.callback.TicketViewDTO;
 import ru.newsystems.basecore.model.dto.domain.TicketGetDTO;
 import ru.newsystems.basecore.model.dto.domain.TicketSearchDTO;
 import ru.newsystems.basecore.model.state.Command;
-import ru.newsystems.basecore.utils.StringUtil;
 import ru.newsystems.webservice.config.cache.CacheStore;
 import ru.newsystems.webservice.service.RestService;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
-import static ru.newsystems.webservice.utils.TelegramUtil.resultOperationToChat;
+import static ru.newsystems.webservice.utils.Telegram.Button.prepareButtons;
+import static ru.newsystems.webservice.utils.Telegram.Notification.resultOperationToChat;
 
 @Component
 public class MyTicketsCommandHandler implements CommandHandler {
@@ -48,10 +43,8 @@ public class MyTicketsCommandHandler implements CommandHandler {
             List<Long> ticketIDs = ticketOperationSearch.get().getTicketIDs();
             Optional<TicketGetDTO> ticketOperationGet = restService.getTicketOperationGet(ticketIDs);
             TicketGetDTO value = ticketOperationGet.get();
-            cache.add(message.getChatId(), value);
-
-            List<TicketJ> tickets = value.getTickets();
-            List<List<InlineKeyboardButton>> inlineKeyboard = prepareButtons(tickets, 0, tickets.size());
+            cache.update(message.getChatId(), value);
+            List<List<InlineKeyboardButton>> inlineKeyboard = prepareButtons(message.getChatId(), value.getTickets(), 0, false);
 
             bot.execute(SendMessage
                     .builder()
@@ -66,8 +59,6 @@ public class MyTicketsCommandHandler implements CommandHandler {
         } else {
             resultOperationToChat(message, bot, false);
         }
-
-        System.out.println("asd");
     }
 
     @Override
@@ -76,65 +67,7 @@ public class MyTicketsCommandHandler implements CommandHandler {
     }
 
 
-    private List<List<InlineKeyboardButton>> prepareButtons(List<TicketJ> tickets, int currentStartItem, int size) {
-        List<List<InlineKeyboardButton>> buttons = new ArrayList<>();
 
-        if (tickets.size() <= 3) {
-            List<InlineKeyboardButton> collect = tickets.stream().map(ticket -> InlineKeyboardButton
-                    .builder()
-                    .text(String.valueOf(ticket))
-                    .callbackData(StringUtil.serialize(
-                            new TicketViewDTO(
-                                    ticket.getTicketNumber(),
-                                    currentStartItem,
-                                    size
-                            )))
-                    .build()).collect(Collectors.toList());
-            buttons.add(collect);
-
-        }
-        else if (tickets.size() == 4) {
-            List<InlineKeyboardButton> firstRow = getListInlineKeyboard(tickets, 0, 2, currentStartItem, size);
-            List<InlineKeyboardButton> secondRow = getListInlineKeyboard(tickets, 2, 4, currentStartItem, size);
-            buttons.add(firstRow);
-            buttons.add(secondRow);
-        }
-        else if (tickets.size() == 5) {
-            List<InlineKeyboardButton> firstRow = getListInlineKeyboard(tickets, 0, 2, currentStartItem, size);
-            List<InlineKeyboardButton> secondRow = getListInlineKeyboard(tickets, 2, 4, currentStartItem, size);
-            List<InlineKeyboardButton> thirdRow = getListInlineKeyboard(tickets, 4, 5, currentStartItem, size);
-            buttons.add(firstRow);
-            buttons.add(secondRow);
-            buttons.add(thirdRow);
-        } else if (tickets.size() >= 6)  {
-            List<InlineKeyboardButton> firstRow = getListInlineKeyboard(tickets, 0, 2, currentStartItem, size);
-            List<InlineKeyboardButton> secondRow = getListInlineKeyboard(tickets, 2, 4, currentStartItem, size);
-            List<InlineKeyboardButton> thirdRow = getListInlineKeyboard(tickets, 4, 6, currentStartItem, size);
-            buttons.add(firstRow);
-            buttons.add(secondRow);
-            buttons.add(thirdRow);
-        } else if (tickets.size() > 6) {
-
-        }
-        return buttons;
-    }
-
-    private List<InlineKeyboardButton> getListInlineKeyboard(List<TicketJ> tickets, int i, int i2, int currentStartItem, int size) {
-        return IntStream
-                .range(i, i2)
-                .mapToObj(index -> InlineKeyboardButton
-                        .builder()
-                        .text(String.valueOf(tickets.get(index).getTicketNumber()))
-                        .callbackData(
-                                StringUtil.serialize(
-                                        new TicketViewDTO(
-                                                tickets.get(index).getTicketNumber(),
-                                                currentStartItem,
-                                                size
-                                        )))
-                        .build())
-                .collect(Collectors.toList());
-    }
 
 
 //    List<List<InlineKeyboardButton>> buttons = new ArrayList<>();
