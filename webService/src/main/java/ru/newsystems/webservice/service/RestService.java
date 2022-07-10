@@ -88,7 +88,8 @@ public class RestService {
 
     public Optional<TicketSearchDTO> getTicketOperationSearch() {
         String url = getUrl("TicketSearch?UserLogin=");
-        ResponseEntity<TicketSearchDTO> response = restTemplate.exchange(url, HttpMethod.POST, null, TicketSearchDTO.class);
+        HttpEntity<Map<String, Object>> requestEntity = getRequestHeaderTickerSearch();
+        ResponseEntity<TicketSearchDTO> response = restTemplate.exchange(url, HttpMethod.POST, requestEntity, TicketSearchDTO.class);
         if (response.getStatusCode() == HttpStatus.OK) {
             return Optional.ofNullable(response.getBody());
         } else {
@@ -96,7 +97,7 @@ public class RestService {
         }
     }
 
-    public HttpEntity<MultiValueMap<String, Object>> getRequestHeaderTickerGet(List<Long> listId) {
+    private HttpEntity<MultiValueMap<String, Object>> getRequestHeaderTickerGet(List<Long> listId) {
         MultiValueMap<String, Object> map = new LinkedMultiValueMap<>();
         map.add("Extended", "1");
         map.add("AllArticles", "1");
@@ -105,7 +106,7 @@ public class RestService {
         return new HttpEntity<>(map, getHttpHeaders(MediaType.APPLICATION_JSON));
     }
 
-    public  HttpEntity<Map<String, Object>> getRequestHeaderTickerUpdate(RequestDataDTO data) {
+    private   HttpEntity<Map<String, Object>> getRequestHeaderTickerUpdate(RequestDataDTO data) {
         Map<String, Object> map = new HashMap<>();
         Map<String, Object> arc = new HashMap<>();
 
@@ -133,7 +134,7 @@ public class RestService {
     }
 
 
-    public  HttpEntity<Map<String, Object>> getRequestHeaderTickerCreate(RequestDataDTO data) {
+    private  HttpEntity<Map<String, Object>> getRequestHeaderTickerCreate(RequestDataDTO data) {
         Map<String, Object> map = new HashMap<>();
         Map<String, Object> arc = new HashMap<>();
         Map<String, Object> ticket = new HashMap<>();
@@ -167,14 +168,15 @@ public class RestService {
 
 
 
-    public HttpEntity<MultiValueMap<String, Object>> getRequestHeaderTickerSearch(List<Long> listTicketNumbers) {
+    private HttpEntity<MultiValueMap<String, Object>> getRequestHeaderTickerSearch(List<Long> listTicketNumbers) {
         MultiValueMap<String, Object> map = new LinkedMultiValueMap<>();
         listTicketNumbers.forEach(e -> map.add("TicketNumber", e));
         return new HttpEntity<>(map, getHttpHeaders(MediaType.APPLICATION_JSON));
     }
 
-    public HttpEntity<MultiValueMap<String, Object>> getRequestHeaderTickerSearch() {
-        MultiValueMap<String, Object> map = new LinkedMultiValueMap<>();
+    public HttpEntity<Map<String, Object>> getRequestHeaderTickerSearch() {
+        Map<String, Object> map = new HashMap<>();
+        map.put("States", "open");
         return new HttpEntity<>(map, getHttpHeaders(MediaType.APPLICATION_JSON));
     }
 

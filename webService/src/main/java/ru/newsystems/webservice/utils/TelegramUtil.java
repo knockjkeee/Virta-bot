@@ -3,6 +3,7 @@ package ru.newsystems.webservice.utils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.telegram.telegrambots.meta.api.methods.GetFile;
+import org.telegram.telegrambots.meta.api.methods.ParseMode;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Document;
 import org.telegram.telegrambots.meta.api.objects.Message;
@@ -44,52 +45,71 @@ public class TelegramUtil {
     }
 
     public static void resultOperationToChat(Update update, VirtaBot bot, boolean isSuccess) throws TelegramApiException {
-        String text = isSuccess ? "✅ Выполнено" : "⛔️ В формате \"Заголовок/Сообщение\" ошибка, проверьте рекомендации";
+        String text = isSuccess ? "<pre>✅ Выполнено</pre>" : "<pre>⛔️ Ошибка в запросе</pre>";
         if (update.hasCallbackQuery()) {
-            bot.execute(SendMessage.builder()
+            bot.execute(SendMessage
+                    .builder()
                     .text(text)
                     .replyToMessageId(update.getCallbackQuery().getMessage().getMessageId())
                     .chatId(update.getCallbackQuery().getMessage().getChatId().toString())
+                    .parseMode(ParseMode.HTML)
                     .build());
         } else {
-            bot.execute(SendMessage.builder()
+            bot.execute(SendMessage
+                    .builder()
                     .text(text)
                     .replyToMessageId(update.getMessage().getMessageId())
                     .chatId(update.getMessage().getChatId().toString())
+                    .parseMode(ParseMode.HTML)
                     //.replyMarkup(ReplyKeyboardRemove.builder().removeKeyboard(true).build())
                     .build());
         }
     }
 
+    public static void resultOperationToChat(Message message, VirtaBot bot, boolean isSuccess) throws TelegramApiException {
+        String text = isSuccess ? "<pre>✅ Выполнено</pre>" : "<pre>❎ Открытых заявок нет</pre>";
+        bot.execute(SendMessage
+                .builder()
+                .text(text)
+                .replyToMessageId(message.getMessageId())
+                .chatId(message.getChatId().toString())
+                .parseMode(ParseMode.HTML)
+                .build());
+    }
+
     public static void receiveReqNum(Update update, VirtaBot bot, Long reqNum) throws TelegramApiException {
-        bot.execute(SendMessage.builder()
-                .text("Номер созданной заявки - " + reqNum)
+        bot.execute(SendMessage
+                .builder()
+                .text("<pre>Номер созданной заявки: " + reqNum + "</pre>")
                 .replyToMessageId(update.getMessage().getMessageId())
                 .chatId(update.getMessage().getChatId().toString())
+                .parseMode(ParseMode.HTML)
                 .build());
     }
 
     public static void sendErrorMsg(VirtaBot bot, Update update, String text, Error error) throws TelegramApiException {
-        String resultText = "❗️❗❗ \n<b>ErrorCode</b>: "
+        String resultText = "❗️❗❗ \n<pre>ErrorCode</pre>: "
                 + error.getErrorCode()
                 + ""
-                + "\n<b>ErrorMessage</b>: "
+                + "\n<pre>ErrorMessage</pre>: "
                 + error.getErrorMessage()
                 + ""
                 + "\nby text: "
                 + text;
         if (update.hasCallbackQuery()) {
-            bot.execute(SendMessage.builder()
+            bot.execute(SendMessage
+                    .builder()
                     .chatId(String.valueOf(update.getCallbackQuery().getMessage().getChatId()))
                     .text(resultText)
-                    .parseMode("html")
+                    .parseMode(ParseMode.HTML)
                     .replyToMessageId(update.getCallbackQuery().getMessage().getMessageId())
                     .build());
         } else {
-            bot.execute(SendMessage.builder()
+            bot.execute(SendMessage
+                    .builder()
                     .chatId(String.valueOf(update.getMessage().getChatId()))
                     .text(resultText)
-                    .parseMode("html")
+                    .parseMode(ParseMode.HTML)
                     .replyToMessageId(update.getMessage().getMessageId())
                     .build());
         }
@@ -100,7 +120,8 @@ public class TelegramUtil {
         if (ticketOperationUpdate.isPresent() && ticketOperationUpdate.get().getError() == null) {
             resultOperationToChat(update, bot, true);
         } else {
-            sendErrorMsg(bot, update, update.getMessage().getReplyToMessage().getText(), ticketOperationUpdate.get()
+            sendErrorMsg(bot, update, update.getMessage().getReplyToMessage().getText(), ticketOperationUpdate
+                    .get()
                     .getError());
         }
     }
@@ -111,7 +132,8 @@ public class TelegramUtil {
             resultOperationToChat(update, bot, true);
             receiveReqNum(update, bot, ticketOperationUpdate.get().getTicketNumber());
         } else {
-            sendErrorMsg(bot, update, update.getMessage().getReplyToMessage().getText(), ticketOperationUpdate.get()
+            sendErrorMsg(bot, update, update.getMessage().getReplyToMessage().getText(), ticketOperationUpdate
+                    .get()
                     .getError());
         }
     }
@@ -146,7 +168,7 @@ public class TelegramUtil {
         String filePath = getFilePath(update, bot);
         String base64 = getBase64(filePath, bot);
         String fileName = filePath.split("/")[1];
-        String contentType  = ContentTypeState.getState(fileName.split("\\.")[1]).getContent();
+        String contentType = ContentTypeState.getState(fileName.split("\\.")[1]).getContent();
         return prepareReqWithAttachment(replyTexts, body, base64, contentType, fileName);
     }
 

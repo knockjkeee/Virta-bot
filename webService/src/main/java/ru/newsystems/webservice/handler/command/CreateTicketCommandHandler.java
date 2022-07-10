@@ -21,13 +21,13 @@ public class CreateTicketCommandHandler implements CommandHandler {
 
     @Override
     public void handleCommand(Message message, String text) throws TelegramApiException {
-        bot.execute(
-                SendMessage.builder()
-                        .text(MessageState.CREATETICKET.getName())
-                        .chatId(String.valueOf(message.getChatId()))
-                        .parseMode(ParseMode.HTML)
-                        .replyMarkup(ForceReplyKeyboard.builder().forceReply(true).build())
-                        .build());
+        bot.execute(SendMessage
+                .builder()
+                .text("<pre>" + MessageState.CREATETICKET.getName() + "</pre>")
+                .chatId(String.valueOf(message.getChatId()))
+                .parseMode(ParseMode.HTML)
+                .replyMarkup(ForceReplyKeyboard.builder().forceReply(true).build())
+                .build());
     }
 
     @Override

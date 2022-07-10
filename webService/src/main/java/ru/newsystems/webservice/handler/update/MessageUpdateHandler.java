@@ -70,7 +70,8 @@ public class MessageUpdateHandler implements UpdateHandler {
     }
 
     private boolean handleText(Update update) throws TelegramApiException {
-        bot.execute(SendChatAction.builder()
+        bot.execute(SendChatAction
+                .builder()
                 .chatId(String.valueOf(update.getMessage().getChatId()))
                 .action(ActionType.TYPING.toString())
                 .build());
@@ -151,7 +152,7 @@ public class MessageUpdateHandler implements UpdateHandler {
                 + "\n<i>Заголовок:</i> \t"
                 + lastArticle.getSubject()
                 + "\n<i>От кого:</i> \t"
-                + lastArticle.getFrom()
+                + lastArticle.getFrom().replaceAll("<", "").replaceAll(">", "")
                 + "\n<i>Кому:</i> \t"
                 + lastArticle.getTo()
                 + "\n<i>Тело сообщения:</i> "
@@ -161,19 +162,23 @@ public class MessageUpdateHandler implements UpdateHandler {
 
         List<List<InlineKeyboardButton>> buttons = new ArrayList<>();
 
-        buttons.add(List.of(InlineKeyboardButton.builder()
+        buttons.add(List.of(InlineKeyboardButton
+                .builder()
                 .text("Отправить комментарий")
                 .callbackData(StringUtil.serialize(new SendDataDTO(ticket.getTicketNumber())))
                 .build()));
-        buttons.add(List.of(InlineKeyboardButton.builder()
+        buttons.add(List.of(InlineKeyboardButton
+                .builder()
                 .text("Выгрузить документы")
                 .callbackData(StringUtil.serialize(new DownloadFilesDTO(ticket.getTicketNumber())))
                 .build()));
 
-        bot.execute(SendMessage.builder()
+        bot.execute(SendMessage
+                .builder()
                 .chatId(String.valueOf(update.getMessage().getChatId()))
                 .text(resultText)
                 .parseMode(ParseMode.HTML)
+                .protectContent(true)
                 .replyToMessageId(update.getMessage().getMessageId())
                 .replyMarkup(InlineKeyboardMarkup.builder().keyboard(buttons).build())
                 .build());
@@ -186,7 +191,8 @@ public class MessageUpdateHandler implements UpdateHandler {
                 + "] <b>"
                 + text
                 + "</b>\nПовторите запрос с корректным id";
-        bot.execute(SendMessage.builder()
+        bot.execute(SendMessage
+                .builder()
                 .chatId(String.valueOf(update.getMessage().getChatId()))
                 .text(resultText)
                 .parseMode("html")

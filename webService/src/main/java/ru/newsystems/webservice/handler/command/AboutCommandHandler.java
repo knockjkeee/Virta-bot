@@ -1,6 +1,7 @@
 package ru.newsystems.webservice.handler.command;
 
 import org.springframework.stereotype.Component;
+import org.telegram.telegrambots.meta.api.methods.ParseMode;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
@@ -20,7 +21,7 @@ public class AboutCommandHandler implements CommandHandler {
     public void handleCommand(Message message, String text) throws TelegramApiException {
         bot.execute(SendMessage.builder()
                 .chatId(message.getChatId().toString())
-                .parseMode("html")
+                .parseMode(ParseMode.HTML)
                 .text("""
                         <i>Этот бот демонстрирует большинство возможностей
                         взаимодействия с информационной системой</i>\040

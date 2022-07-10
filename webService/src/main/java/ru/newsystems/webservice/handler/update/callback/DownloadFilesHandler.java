@@ -2,6 +2,7 @@ package ru.newsystems.webservice.handler.update.callback;
 
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.ActionType;
+import org.telegram.telegrambots.meta.api.methods.ParseMode;
 import org.telegram.telegrambots.meta.api.methods.send.SendChatAction;
 import org.telegram.telegrambots.meta.api.methods.send.SendDocument;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
@@ -44,18 +45,21 @@ public class DownloadFilesHandler extends CallbackUpdateHandler<DownloadFilesDTO
     @Override
     protected void handleCallback(Update update, DownloadFilesDTO dto) throws TelegramApiException {
         Long id = update.getCallbackQuery().getMessage().getChatId();
-        bot.execute(SendChatAction.builder()
+        bot.execute(SendChatAction
+                .builder()
                 .chatId(String.valueOf(update.getCallbackQuery().getMessage().getChatId()))
                 .action(ActionType.UPLOADDOCUMENT.toString())
                 .build());
         TicketJ ticket = localRepo.get(id).getTicket();
         List<Attachment> attachments = ticket.getArticles().get(ticket.getArticles().size() - 1).getAttachments();
         if (attachments == null) {
-            String text = "⛔️ Файлы для скачивания отсутствуют в последнем комментарии.";
-            bot.execute(SendMessage.builder()
+            String text = "<pre>⛔️ Файлы для скачивания отсутствуют в последнем комментарии.</pre>";
+            bot.execute(SendMessage
+                    .builder()
                     .text(text)
                     .replyToMessageId(update.getCallbackQuery().getMessage().getMessageId())
                     .chatId(update.getCallbackQuery().getMessage().getChatId().toString())
+                    .parseMode(ParseMode.HTML)
                     .build());
         } else if (attachments.size() != 0) {
             attachments.forEach(e -> {
@@ -70,7 +74,8 @@ public class DownloadFilesHandler extends CallbackUpdateHandler<DownloadFilesDTO
 
     private void prepareFileToSend(Update update, Attachment e) throws TelegramApiException {
         byte[] decode = Base64.getDecoder().decode(e.getContent().getBytes(StandardCharsets.UTF_8));
-        bot.execute(SendDocument.builder()
+        bot.execute(SendDocument
+                .builder()
                 .chatId(String.valueOf(update.getCallbackQuery().getMessage().getChatId()))
                 .document(new InputFile(new ByteArrayInputStream(decode), e.getFilename()))
                 .build());

@@ -10,6 +10,7 @@ public enum SerializableInlineType {
   NEXT_PAGE(6),
   DOWNLOAD(7),
   SEND_COMMENT(8),
+  TICKET_VIEW(9),
   ;
 
   private final int index;

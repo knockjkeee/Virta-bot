@@ -6,7 +6,7 @@ import com.google.common.cache.CacheBuilder;
 import java.util.concurrent.TimeUnit;
 
 public class CacheStore<T> {
-    private Cache<String, T> cache;
+    private Cache<Long, T> cache;
 
     public CacheStore(int expiryDuration, TimeUnit timeUnit) {
 
@@ -16,11 +16,11 @@ public class CacheStore<T> {
                 .build();
     }
 
-    public T get(String key) {
+    public T get(Long key) {
         return cache.getIfPresent(key);
     }
 
-    public void add(String key, T value) {
+    public void add(Long key, T value) {
         if (key != null && value != null) {
             cache.put(key, value);
             System.out.println("Record stored in "
