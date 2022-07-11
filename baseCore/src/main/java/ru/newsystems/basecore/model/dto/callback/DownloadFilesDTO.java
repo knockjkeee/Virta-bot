@@ -17,14 +17,19 @@ public class DownloadFilesDTO extends SerializableInlineObject {
   @JsonProperty("t")
   private String ticketId;
 
+  @JsonProperty("f")
+  private String from;
+
+
   public DownloadFilesDTO() {
     super(SerializableInlineType.DOWNLOAD);
   }
 
-  public DownloadFilesDTO(Long chatId, String ticketId, Long articleId) {
+  public DownloadFilesDTO(Long chatId, String ticketId, Long articleId, String from) {
     this();
     this.chatId = chatId;
     this.ticketId = ticketId;
     this.articleId = articleId;
+    this.from = from;
   }
 }

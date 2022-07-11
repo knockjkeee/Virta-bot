@@ -61,7 +61,7 @@ public class DownloadFilesHandler extends CallbackUpdateHandler<DownloadFilesDTO
         MessageGetDTO messageGetDTO = localRepo.get(id);
         List<Attachment> attachments;
         TicketJ ticket;
-        if (messageGetDTO != null && messageGetDTO.getTicket().getTicketNumber().equals(dto.getTicketId())) {
+        if (dto.getFrom().equals("s")) {
             ticket = messageGetDTO.getTicket();
             attachments = ticket.getArticles().get(ticket.getArticles().size() - 1).getAttachments();
         } else {

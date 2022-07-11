@@ -45,7 +45,7 @@ public class Button {
             buttons.add(List.of(InlineKeyboardButton
                     .builder()
                     .text("Выгрузить документы")
-                    .callbackData(StringUtil.serialize(new DownloadFilesDTO(chatId, ticket.getTicketNumber(), article.getArticleID())))
+                    .callbackData(StringUtil.serialize(new DownloadFilesDTO(chatId, ticket.getTicketNumber(), article.getArticleID(), "d")))
                     .build()));
         }
 //        prepareRowButtonFromArticles(articles, buttons);
