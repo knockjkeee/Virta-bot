@@ -15,17 +15,17 @@ import java.util.stream.IntStream;
 public class Button {
     public static final double COUNT_ITEM_IN_PAGE = 6.0;
 
-    public static List<List<InlineKeyboardButton>> prepareButtons(Long msgId, List<TicketJ> tickets, int page, boolean isHome, int fullSize) {
+    public static List<List<InlineKeyboardButton>> prepareButtons(List<TicketJ> tickets, int page, int fullSize) {
         List<List<InlineKeyboardButton>> buttons = new ArrayList<>();
         prepareRowButton(tickets, buttons);
-        if (isHome) {
-            buttons.add(List.of(InlineKeyboardButton
-                    .builder()
-                    .text(ReplyKeyboardButton.HOME.getLabel())
-                    .callbackData(StringUtil.serialize(new TicketsViewDTO(msgId, page + 1, tickets.size(), true, "to")))
-                    .build()));
-        }
-        prepareNavigationButton(msgId, tickets, page, buttons, isHome, fullSize);
+//        if (isHome) {
+//            buttons.add(List.of(InlineKeyboardButton
+//                    .builder()
+//                    .text(ReplyKeyboardButton.HOME.getLabel())
+//                    .callbackData(StringUtil.serialize(new TicketsViewDTO(page + 1, tickets.size(),"to")))
+//                    .build()));
+//        }
+        prepareNavigationButton(tickets, page, buttons, fullSize);
         return buttons;
     }
 
@@ -33,34 +33,30 @@ public class Button {
         return Math.ceil((double) size / COUNT_ITEM_IN_PAGE);
     }
 
-    private static void prepareNavigationButton(Long msgId, List<TicketJ> tickets, int page, List<List<InlineKeyboardButton>> buttons, boolean isHome, int fullSize) {
-        if (fullSize > 6) {
-            double allPages = getAllPages(fullSize);
-            if (page == 0) {
+    private static void prepareNavigationButton(List<TicketJ> tickets, int page, List<List<InlineKeyboardButton>> buttons, int fullSizeData) {
+        if (fullSizeData > 6) {
+            double allPages = getAllPages(fullSizeData);
+            if (page == 1) {
                 buttons.add(List.of(InlineKeyboardButton
                         .builder()
                         .text(ReplyKeyboardButton.TO.getLabel())
-                        .callbackData(StringUtil.serialize(new TicketsViewDTO(msgId, page
-                                + 1, tickets.size(), isHome, "to")))
+                        .callbackData(StringUtil.serialize(new TicketsViewDTO(page, tickets.size(), "to")))
                         .build()));
             } else if (allPages == page) {
                 buttons.add(List.of(InlineKeyboardButton
                         .builder()
                         .text(ReplyKeyboardButton.BACK.getLabel())
-                        .callbackData(StringUtil.serialize(new TicketsViewDTO(msgId, page
-                                - 1, tickets.size(), isHome, "back")))
+                        .callbackData(StringUtil.serialize(new TicketsViewDTO(page, tickets.size(), "back")))
                         .build()));
             } else {
                 buttons.add(List.of(InlineKeyboardButton
                         .builder()
                         .text(ReplyKeyboardButton.BACK.getLabel())
-                        .callbackData(StringUtil.serialize(new TicketsViewDTO(msgId, page
-                                - 1, tickets.size(), isHome, "back")))
+                        .callbackData(StringUtil.serialize(new TicketsViewDTO(page, tickets.size(), "back")))
                         .build(), InlineKeyboardButton
                         .builder()
                         .text(ReplyKeyboardButton.TO.getLabel())
-                        .callbackData(StringUtil.serialize(new TicketsViewDTO(msgId, page
-                                + 1, tickets.size(), isHome, "to")))
+                        .callbackData(StringUtil.serialize(new TicketsViewDTO(page, tickets.size(), "to")))
                         .build()));
             }
         }

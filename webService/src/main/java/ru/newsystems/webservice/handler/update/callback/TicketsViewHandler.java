@@ -12,25 +12,20 @@ import ru.newsystems.basecore.model.dto.callback.TicketsViewDTO;
 import ru.newsystems.basecore.model.dto.domain.TicketGetDTO;
 import ru.newsystems.basecore.model.state.SerializableInlineType;
 import ru.newsystems.webservice.config.cache.CacheStore;
-import ru.newsystems.webservice.service.RestService;
 import ru.newsystems.webservice.utils.Telegram.Button;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static ru.newsystems.webservice.utils.Telegram.Button.getAllPages;
 import static ru.newsystems.webservice.utils.Telegram.Button.prepareButtons;
 
 @Component
 public class TicketsViewHandler extends CallbackUpdateHandler<TicketsViewDTO> {
 
-    public static final double COUNT_ITEM_IN_PAGE = 6.0;
-    private final RestService restService;
     private final VirtaBot bot;
     private final CacheStore<TicketGetDTO> cache;
 
-    public TicketsViewHandler(RestService restService, VirtaBot bot, CacheStore<TicketGetDTO> cache) {
-        this.restService = restService;
+    public TicketsViewHandler(VirtaBot bot, CacheStore<TicketGetDTO> cache) {
         this.bot = bot;
         this.cache = cache;
     }
@@ -50,7 +45,6 @@ public class TicketsViewHandler extends CallbackUpdateHandler<TicketsViewDTO> {
 
         TicketGetDTO ticket = cache.get(update.getCallbackQuery().getMessage().getChatId());
         if (ticket != null) {
-            double allPages = getAllPages(dto.getSize());
             String direction = dto.getDirection();
             if (direction.equals("to")) {
                 List<TicketJ> tickets = ticket
@@ -58,10 +52,10 @@ public class TicketsViewHandler extends CallbackUpdateHandler<TicketsViewDTO> {
                         .stream()
                         .skip((long) (dto.getPage() * Button.COUNT_ITEM_IN_PAGE))
                         .collect(Collectors.toList());
-                List<List<InlineKeyboardButton>> inlineKeyboard = prepareButtons(update
-                        .getCallbackQuery()
-                        .getMessage()
-                        .getChatId(), tickets, dto.getPage() + 1, false, ticket.getTickets().size());
+
+                List<List<InlineKeyboardButton>> inlineKeyboard = prepareButtons(tickets, dto.getPage() + 1, ticket
+                        .getTickets()
+                        .size());
 
                 bot.execute(EditMessageReplyMarkup
                         .builder()
@@ -69,18 +63,17 @@ public class TicketsViewHandler extends CallbackUpdateHandler<TicketsViewDTO> {
                         .messageId(update.getCallbackQuery().getMessage().getMessageId())
                         .replyMarkup(InlineKeyboardMarkup.builder().keyboard(inlineKeyboard).build())
                         .build());
-
             }
             if (direction.equals("back")) {
                 List<TicketJ> tickets = ticket
                         .getTickets()
                         .stream()
-                        .skip((long) ((dto.getPage() - 1) * Button.COUNT_ITEM_IN_PAGE))
+                        .skip((long) ((dto.getPage() - 1) * Button.COUNT_ITEM_IN_PAGE - Button.COUNT_ITEM_IN_PAGE))
                         .collect(Collectors.toList());
-                List<List<InlineKeyboardButton>> inlineKeyboard = prepareButtons(update
-                        .getCallbackQuery()
-                        .getMessage()
-                        .getChatId(), tickets, dto.getPage() - 1, false, ticket.getTickets().size());
+
+                List<List<InlineKeyboardButton>> inlineKeyboard = prepareButtons(tickets, dto.getPage() - 1, ticket
+                        .getTickets()
+                        .size());
 
                 bot.execute(EditMessageReplyMarkup
                         .builder()
@@ -89,11 +82,6 @@ public class TicketsViewHandler extends CallbackUpdateHandler<TicketsViewDTO> {
                         .replyMarkup(InlineKeyboardMarkup.builder().keyboard(inlineKeyboard).build())
                         .build());
             }
-
-
-//            ticket.getTickets().stream().skip()
         }
-
-        System.out.println("tickets");
     }
 }
