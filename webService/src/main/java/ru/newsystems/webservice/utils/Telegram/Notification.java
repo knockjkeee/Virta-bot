@@ -91,4 +91,20 @@ public class Notification {
                 .parseMode(ParseMode.HTML)
                 .build());
     }
+
+    public static void sendExceptionMsg(Update update, String text, String service, VirtaBot bot) throws TelegramApiException {
+        String resultText = "❗❗❗️ \n<b>Ошибка в запросе</b>"
+                + "\nВ поиск передано не верное значение: ["
+                + service
+                + "] <b>"
+                + text
+                + "</b>\nПовторите запрос с корректным id";
+        bot.execute(SendMessage
+                .builder()
+                .chatId(String.valueOf(update.getMessage().getChatId()))
+                .text(resultText)
+                .parseMode("html")
+                .replyToMessageId(update.getMessage().getMessageId())
+                .build());
+    }
 }

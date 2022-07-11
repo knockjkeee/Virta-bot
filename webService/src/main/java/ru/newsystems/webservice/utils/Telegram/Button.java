@@ -34,7 +34,7 @@ public class Button {
 //                    .callbackData(StringUtil.serialize(new TicketsViewDTO(page + 1, tickets.size(),"to")))
 //                    .build()));
 //        }
-        prepareNavigationButtonFromTickets(tickets, page, buttons, fullSize);
+        prepareNavigationButtonFromTickets(page, buttons, fullSize);
         return buttons;
     }
 
@@ -53,30 +53,30 @@ public class Button {
     }
 
 
-    private static void prepareNavigationButtonFromTickets(List<TicketJ> tickets, int page, List<List<InlineKeyboardButton>> buttons, int fullSizeData) {
+    private static void prepareNavigationButtonFromTickets(int page, List<List<InlineKeyboardButton>> buttons, int fullSizeData) {
         if (fullSizeData > 6) {
             double allPages = getAllPages(fullSizeData);
             if (page == 1) {
                 buttons.add(List.of(InlineKeyboardButton
                         .builder()
                         .text(ReplyKeyboardButton.TO.getLabel())
-                        .callbackData(StringUtil.serialize(new TicketsNavigationViewDTO(page, tickets.size(), "to")))
+                        .callbackData(StringUtil.serialize(new TicketsNavigationViewDTO(page, "to")))
                         .build()));
             } else if (allPages == page) {
                 buttons.add(List.of(InlineKeyboardButton
                         .builder()
                         .text(ReplyKeyboardButton.BACK.getLabel())
-                        .callbackData(StringUtil.serialize(new TicketsNavigationViewDTO(page, tickets.size(), "back")))
+                        .callbackData(StringUtil.serialize(new TicketsNavigationViewDTO(page, "back")))
                         .build()));
             } else {
                 buttons.add(List.of(InlineKeyboardButton
                         .builder()
                         .text(ReplyKeyboardButton.BACK.getLabel())
-                        .callbackData(StringUtil.serialize(new TicketsNavigationViewDTO(page, tickets.size(), "back")))
+                        .callbackData(StringUtil.serialize(new TicketsNavigationViewDTO(page, "back")))
                         .build(), InlineKeyboardButton
                         .builder()
                         .text(ReplyKeyboardButton.TO.getLabel())
-                        .callbackData(StringUtil.serialize(new TicketsNavigationViewDTO(page, tickets.size(), "to")))
+                        .callbackData(StringUtil.serialize(new TicketsNavigationViewDTO(page, "to")))
                         .build()));
             }
         }
@@ -86,7 +86,7 @@ public class Button {
         buttons.add(List.of(InlineKeyboardButton
                 .builder()
                 .text(ReplyKeyboardButton.HOME.getLabel() + "Заявок")
-                .callbackData(StringUtil.serialize(new TicketsHomeViewDTO( 0)))
+                .callbackData(StringUtil.serialize(new TicketsHomeViewDTO(0)))
                 .build()));
         if (fullSizeData > 6) {
             double allPages = getAllPages(fullSizeData);
