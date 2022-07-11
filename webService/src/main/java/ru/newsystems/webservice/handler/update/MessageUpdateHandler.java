@@ -127,7 +127,7 @@ public class MessageUpdateHandler implements UpdateHandler {
                 .build()), List.of(InlineKeyboardButton
                 .builder()
                 .text("Выгрузить документы")
-                .callbackData(StringUtil.serialize(new DownloadFilesDTO(ticket.getTicketNumber())))
+                .callbackData(StringUtil.serialize(new DownloadFilesDTO(update.getMessage().getChatId(), ticket.getTicketNumber(), 0L)))
                 .build()));
 
         bot.execute(SendMessage

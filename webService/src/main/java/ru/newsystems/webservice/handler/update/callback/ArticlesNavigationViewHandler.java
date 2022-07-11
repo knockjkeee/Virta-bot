@@ -10,7 +10,7 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import ru.newsystems.basecore.integration.VirtaBot;
 import ru.newsystems.basecore.model.domain.Article;
 import ru.newsystems.basecore.model.domain.TicketJ;
-import ru.newsystems.basecore.model.dto.callback.TicketViewDTO;
+import ru.newsystems.basecore.model.dto.callback.ArticlesNavigationViewDTO;
 import ru.newsystems.basecore.model.dto.domain.TicketGetDTO;
 import ru.newsystems.basecore.model.state.SerializableInlineType;
 import ru.newsystems.webservice.config.cache.CacheStore;
@@ -24,28 +24,28 @@ import static ru.newsystems.webservice.utils.Telegram.Messages.prepareTextForTic
 import static ru.newsystems.webservice.utils.Telegram.Notification.queryIsMissing;
 
 @Component
-public class TicketViewHandler extends CallbackUpdateHandler<TicketViewDTO> {
+public class ArticlesNavigationViewHandler extends CallbackUpdateHandler<ArticlesNavigationViewDTO> {
 
     private final VirtaBot bot;
     private final CacheStore<TicketGetDTO> cache;
 
-    public TicketViewHandler(VirtaBot bot, CacheStore<TicketGetDTO> cache) {
+    public ArticlesNavigationViewHandler(VirtaBot bot, CacheStore<TicketGetDTO> cache) {
         this.bot = bot;
         this.cache = cache;
     }
 
     @Override
-    protected Class<TicketViewDTO> getDtoType() {
-        return TicketViewDTO.class;
+    protected Class<ArticlesNavigationViewDTO> getDtoType() {
+        return ArticlesNavigationViewDTO.class;
     }
 
     @Override
     protected SerializableInlineType getSerializableType() {
-        return SerializableInlineType.TICKET_VIEW;
+        return SerializableInlineType.ARTICLE_NAVIGATION;
     }
 
     @Override
-    protected void handleCallback(Update update, TicketViewDTO dto) throws TelegramApiException {
+    protected void handleCallback(Update update, ArticlesNavigationViewDTO dto) throws TelegramApiException {
 
         TicketGetDTO ticket = cache.get(update.getCallbackQuery().getMessage().getChatId());
         if (ticket != null) {
@@ -58,23 +58,23 @@ public class TicketViewHandler extends CallbackUpdateHandler<TicketViewDTO> {
             Optional<TicketJ> currentTicket = ticket
                     .getTickets()
                     .stream()
-                    .filter(e -> e.getTicketNumber().equals(dto.getTicketId()))
+                    .filter(e -> e.getTicketNumber().equals(dto.getTicketNumber()))
                     .findFirst();
             if (currentTicket.isPresent()) {
-                int page = 1;
-                TicketJ ticketView = currentTicket.get();
-                Article article = ticketView.getArticles().get(0);
-                List<List<InlineKeyboardButton>> inlineKeyboard = prepareButtonsFromArticles(update.getCallbackQuery().getMessage().getChatId(), article, page, ticketView);
-                String resultText = prepareTextForTickerAndArticle(page, ticketView, article);
-
-                bot.execute(EditMessageText
-                        .builder()
-                        .chatId(String.valueOf(update.getCallbackQuery().getMessage().getChatId()))
-                        .messageId(update.getCallbackQuery().getMessage().getMessageId())
-                        .text(resultText)
-                        .parseMode(ParseMode.HTML)
-                        .build());
-                editedInlineKeyboard(update, InlineKeyboardMarkup.builder().keyboard(inlineKeyboard), bot);
+                if (dto.getDirection().equals("to")) {
+                    int page = dto.getPage() + 1;
+                    TicketJ ticketView = currentTicket.get();
+                    Article article = ticketView.getArticles().get(dto.getPage());
+                    List<List<InlineKeyboardButton>> inlineKeyboard = prepareButtonsFromArticles(update.getCallbackQuery().getMessage().getChatId(), article, page, ticketView);
+                    prepareDataAndExecute(update, page, ticketView, article, inlineKeyboard);
+                }
+                if (dto.getDirection().equals("back")) {
+                    int page = dto.getPage() - 1;
+                    TicketJ ticketView = currentTicket.get();
+                    Article article = ticketView.getArticles().get(page);
+                    List<List<InlineKeyboardButton>> inlineKeyboard = prepareButtonsFromArticles(update.getCallbackQuery().getMessage().getChatId(), article, page, ticketView);
+                    prepareDataAndExecute(update, page, ticketView, article, inlineKeyboard);
+                }
             } else {
                 errorByQuery(update);
             }
@@ -83,6 +83,18 @@ public class TicketViewHandler extends CallbackUpdateHandler<TicketViewDTO> {
         }
     }
 
+    private void prepareDataAndExecute(Update update, int page, TicketJ ticket, Article article, List<List<InlineKeyboardButton>> inlineKeyboard) throws TelegramApiException {
+        String resultText = prepareTextForTickerAndArticle(page, ticket, article);
+
+        bot.execute(EditMessageText
+                .builder()
+                .chatId(String.valueOf(update.getCallbackQuery().getMessage().getChatId()))
+                .messageId(update.getCallbackQuery().getMessage().getMessageId())
+                .text(resultText)
+                .parseMode(ParseMode.HTML)
+                .build());
+        editedInlineKeyboard(update, InlineKeyboardMarkup.builder().keyboard(inlineKeyboard), bot);
+    }
 
 
     private void errorByQuery(Update update) throws TelegramApiException {

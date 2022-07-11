@@ -47,4 +47,23 @@ public class Messages {
                 + "\n<i>Количество файлов прикрепленных к комментарию:</i> \t"
                 + sizeAttach;
     }
+
+
+    @NotNull
+    public static String prepareTextForTickerAndArticle(int page, TicketJ ticketView, Article article) {
+        String ticketText = prepareTextTicket(ticketView);
+        String countTMsgText = ticketText + "\n<i>Количество комментариев:</i>  " + page + " из " + ticketView
+                .getArticles()
+                .size();
+        int sizeAttach = article.getAttachments() == null ? 0 : article.getAttachments().size();
+        String lastComment = countTMsgText
+                + "\n\n<pre>Комментарий №"
+                + page
+                + " (id "
+                + article.getArticleID()
+                + ")"
+                + ":</pre>";
+        String resultText = prepareTextArticle(article, sizeAttach, lastComment);
+        return resultText;
+    }
 }

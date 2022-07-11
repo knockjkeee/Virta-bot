@@ -38,9 +38,17 @@ public class Button {
         return buttons;
     }
 
-    public static List<List<InlineKeyboardButton>> prepareButtonsFromArticles(List<Article> articles, int page, int fullSize) {
+    public static List<List<InlineKeyboardButton>> prepareButtonsFromArticles(Long chatId, Article article, int page, TicketJ ticket) {
         List<List<InlineKeyboardButton>> buttons = new ArrayList<>();
-        prepareRowButtonFromArticles(articles, buttons);
+
+        if (article.getAttachments() != null && article.getAttachments().size() > 0) {
+            buttons.add(List.of(InlineKeyboardButton
+                    .builder()
+                    .text("Выгрузить документы")
+                    .callbackData(StringUtil.serialize(new DownloadFilesDTO(chatId, ticket.getTicketNumber(), article.getArticleID())))
+                    .build()));
+        }
+//        prepareRowButtonFromArticles(articles, buttons);
 //        if (isHome) {
 //            buttons.add(List.of(InlineKeyboardButton
 //                    .builder()
@@ -48,7 +56,7 @@ public class Button {
 //                    .callbackData(StringUtil.serialize(new TicketsViewDTO(page + 1, tickets.size(),"to")))
 //                    .build()));
 //        }
-        prepareNavigationButtonFromArticles(articles, page, buttons, fullSize);
+        prepareNavigationButtonFromArticles(page, buttons, ticket);
         return buttons;
     }
 
@@ -82,7 +90,8 @@ public class Button {
         }
     }
 
-    private static void prepareNavigationButtonFromArticles(List<Article> articles, int page, List<List<InlineKeyboardButton>> buttons, int fullSizeData) {
+    private static void prepareNavigationButtonFromArticles(int page, List<List<InlineKeyboardButton>> buttons, TicketJ ticket) {
+        int fullSizeData = ticket.getArticles().size();
         buttons.add(List.of(InlineKeyboardButton
                 .builder()
                 .text(ReplyKeyboardButton.HOME.getLabel() + "Заявок")
@@ -94,23 +103,23 @@ public class Button {
                 buttons.add(List.of(InlineKeyboardButton
                         .builder()
                         .text(ReplyKeyboardButton.TO.getLabel())
-                        .callbackData(StringUtil.serialize(new ArticlesNavigationViewDTO(page, articles.size(), "to")))
+                        .callbackData(StringUtil.serialize(new ArticlesNavigationViewDTO(page, "to", ticket.getTicketNumber())))
                         .build()));
-            } else if (allPages == page) {
+            } else if (fullSizeData == page) {
                 buttons.add(List.of(InlineKeyboardButton
                         .builder()
                         .text(ReplyKeyboardButton.BACK.getLabel())
-                        .callbackData(StringUtil.serialize(new ArticlesNavigationViewDTO(page, articles.size(), "back")))
+                        .callbackData(StringUtil.serialize(new ArticlesNavigationViewDTO(page, "back",ticket.getTicketNumber())))
                         .build()));
             } else {
                 buttons.add(List.of(InlineKeyboardButton
                         .builder()
                         .text(ReplyKeyboardButton.BACK.getLabel())
-                        .callbackData(StringUtil.serialize(new ArticlesNavigationViewDTO(page, articles.size(), "back")))
+                        .callbackData(StringUtil.serialize(new ArticlesNavigationViewDTO(page, "back", ticket.getTicketNumber())))
                         .build(), InlineKeyboardButton
                         .builder()
                         .text(ReplyKeyboardButton.TO.getLabel())
-                        .callbackData(StringUtil.serialize(new ArticlesNavigationViewDTO(page, articles.size(), "to")))
+                        .callbackData(StringUtil.serialize(new ArticlesNavigationViewDTO(page, "to", ticket.getTicketNumber())))
                         .build()));
             }
         }

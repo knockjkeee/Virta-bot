@@ -9,14 +9,22 @@ import ru.newsystems.basecore.model.state.SerializableInlineType;
 @Setter
 public class DownloadFilesDTO extends SerializableInlineObject {
   @JsonProperty("m")
-  private String messageId;
+  private Long chatId;
+
+  @JsonProperty("a")
+  private Long articleId;
+
+  @JsonProperty("t")
+  private String ticketId;
 
   public DownloadFilesDTO() {
     super(SerializableInlineType.DOWNLOAD);
   }
 
-  public DownloadFilesDTO(String messageId) {
+  public DownloadFilesDTO(Long chatId, String ticketId, Long articleId) {
     this();
-    this.messageId = messageId;
+    this.chatId = chatId;
+    this.ticketId = ticketId;
+    this.articleId = articleId;
   }
 }
