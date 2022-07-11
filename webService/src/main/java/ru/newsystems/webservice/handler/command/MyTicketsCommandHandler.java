@@ -1,7 +1,9 @@
 package ru.newsystems.webservice.handler.command;
 
 import org.springframework.stereotype.Component;
+import org.telegram.telegrambots.meta.api.methods.ActionType;
 import org.telegram.telegrambots.meta.api.methods.ParseMode;
+import org.telegram.telegrambots.meta.api.methods.send.SendChatAction;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
@@ -40,11 +42,18 @@ public class MyTicketsCommandHandler implements CommandHandler {
         if (ticketOperationSearch.isPresent()
                 && ticketOperationSearch.get().getTicketIDs() != null
                 && ticketOperationSearch.get().getTicketIDs().size() > 0) {
+
+            bot.execute(SendChatAction
+                    .builder()
+                    .chatId(String.valueOf(message.getChatId()))
+                    .action(ActionType.TYPING.toString())
+                    .build());
+
             List<Long> ticketIDs = ticketOperationSearch.get().getTicketIDs();
             Optional<TicketGetDTO> ticketOperationGet = restService.getTicketOperationGet(ticketIDs);
             TicketGetDTO value = ticketOperationGet.get();
             cache.update(message.getChatId(), value);
-            List<List<InlineKeyboardButton>> inlineKeyboard = prepareButtons(message.getChatId(), value.getTickets(), 0, false);
+            List<List<InlineKeyboardButton>> inlineKeyboard = prepareButtons(message.getChatId(), value.getTickets(), 0, false, value.getTickets().size());
 
             bot.execute(SendMessage
                     .builder()
@@ -65,21 +74,5 @@ public class MyTicketsCommandHandler implements CommandHandler {
     public Command getCommand() {
         return Command.MY_TICKET;
     }
-
-
-
-
-
-//    List<List<InlineKeyboardButton>> buttons = new ArrayList<>();
-//        buttons.add(List.of(InlineKeyboardButton
-//                .builder()
-//                .text("Отправить комментарий")
-//                .callbackData(StringUtil.serialize(new SendDataDTO(ticket.getTicketNumber())))
-//            .build()));
-//        buttons.add(List.of(InlineKeyboardButton
-//                .builder()
-//                .text("Выгрузить документы")
-//                .callbackData(StringUtil.serialize(new DownloadFilesDTO(ticket.getTicketNumber())))
-//            .build()));
 
 }

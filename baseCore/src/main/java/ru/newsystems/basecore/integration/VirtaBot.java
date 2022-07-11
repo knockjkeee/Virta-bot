@@ -2,7 +2,6 @@ package ru.newsystems.basecore.integration;
 
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
-import org.telegram.telegrambots.meta.api.methods.commands.SetMyCommands;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.commands.BotCommand;
 import ru.newsystems.basecore.model.state.Command;
@@ -66,7 +65,7 @@ public class VirtaBot extends TelegramLongPollingBot implements Customer {
                             .map(c -> BotCommand.builder().command(c.getName()).description(c.getDesc()).build())
                             .collect(Collectors.toList());
             //TODO add my command
-            execute(SetMyCommands.builder().commands(commands).build());
+            //execute(SetMyCommands.builder().commands(commands).build());
         } catch (Exception e) {
             e.printStackTrace();
         }

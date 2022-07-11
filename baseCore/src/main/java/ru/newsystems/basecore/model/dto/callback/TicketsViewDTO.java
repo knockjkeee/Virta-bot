@@ -20,16 +20,20 @@ public class TicketsViewDTO extends SerializableInlineObject {
   @JsonProperty("h")
   private boolean isHome;
 
+  @JsonProperty("d")
+  private String direction;
+
 
   public TicketsViewDTO() {
     super(SerializableInlineType.TICKETS_VIEW);
   }
 
-  public TicketsViewDTO(Long messageId, int page, int size, boolean isHome ) {
+  public TicketsViewDTO(Long messageId, int page, int size, boolean isHome, String direction ) {
     this();
     this.messageId = messageId;
     this.size = size;
     this.page = page;
     this.isHome = isHome;
+    this.direction = direction;
   }
 }

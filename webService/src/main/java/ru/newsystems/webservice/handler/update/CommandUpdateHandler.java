@@ -16,7 +16,7 @@ import java.util.Optional;
 import static ru.newsystems.webservice.utils.Telegram.Action.getMessage;
 
 @Component
-public class CommandUpdateHandler implements UpdateHandler{
+public class CommandUpdateHandler implements UpdateHandler {
 
     private final CommandParser commandParser;
 
@@ -40,8 +40,7 @@ public class CommandUpdateHandler implements UpdateHandler{
         return true;
     }
 
-    private void handleCommand(Update update, Command command, String text)
-            throws TelegramApiException {
+    private void handleCommand(Update update, Command command, String text) throws TelegramApiException {
         CommandHandler commandHandler = commandHandlerFactory.getHandler(command);
         commandHandler.handleCommand(update.getMessage(), text);
     }

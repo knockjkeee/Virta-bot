@@ -24,6 +24,6 @@ public class BaseConfig {
 
     @Bean
     public CacheStore<TicketGetDTO> ticketGetDTOCache(){
-        return new CacheStore<>(5, TimeUnit.MINUTES);
+        return new CacheStore<>(30, TimeUnit.MINUTES);
     }
 }
