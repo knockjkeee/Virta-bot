@@ -7,9 +7,9 @@ import java.util.Optional;
 
 @Getter
 public enum ReplyKeyboardButton {
-    HOME("Домой \uD83C\uDFE0"),
+    HOME("\uD83C\uDFE0 В список "),
     BACK("◀️ Назад"),
-    TO("Дальше ▶️"),
+    TO("Вперед ▶️"),
     NONE("???");
 
     private String label;

@@ -2,6 +2,7 @@ package ru.newsystems.webservice.utils.Telegram;
 
 import org.telegram.telegrambots.meta.api.methods.ParseMode;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
@@ -79,5 +80,15 @@ public class Notification {
                     .replyToMessageId(update.getMessage().getMessageId())
                     .build());
         }
+    }
+
+    public static void queryIsMissing(Update update, VirtaBot bot) throws TelegramApiException {
+        bot.execute(EditMessageText
+                .builder()
+                .chatId(String.valueOf(update.getCallbackQuery().getMessage().getChatId()))
+                .messageId(update.getCallbackQuery().getMessage().getMessageId())
+                .text("<pre>Запрос закрыт по таймауту, для возобновления работы воспользуйтесь командой /my_ticket</pre>")
+                .parseMode(ParseMode.HTML)
+                .build());
     }
 }

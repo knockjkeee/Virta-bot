@@ -19,7 +19,7 @@ import ru.newsystems.webservice.service.RestService;
 import java.util.List;
 import java.util.Optional;
 
-import static ru.newsystems.webservice.utils.Telegram.Button.prepareButtons;
+import static ru.newsystems.webservice.utils.Telegram.Button.prepareButtonsFromTickets;
 import static ru.newsystems.webservice.utils.Telegram.Notification.resultOperationToChat;
 
 @Component
@@ -53,7 +53,7 @@ public class MyTicketsCommandHandler implements CommandHandler {
             Optional<TicketGetDTO> ticketOperationGet = restService.getTicketOperationGet(ticketIDs);
             TicketGetDTO value = ticketOperationGet.get();
             cache.update(message.getChatId(), value);
-            List<List<InlineKeyboardButton>> inlineKeyboard = prepareButtons(value.getTickets(), 1, value
+            List<List<InlineKeyboardButton>> inlineKeyboard = prepareButtonsFromTickets(value.getTickets(), 1, value
                     .getTickets()
                     .size());
 
