@@ -27,13 +27,6 @@ public class Button {
     public static List<List<InlineKeyboardButton>> prepareButtonsFromTickets(List<TicketJ> tickets, int page, int fullSize) {
         List<List<InlineKeyboardButton>> buttons = new ArrayList<>();
         prepareRowButtonFromTickets(tickets, buttons);
-//        if (isHome) {
-//            buttons.add(List.of(InlineKeyboardButton
-//                    .builder()
-//                    .text(ReplyKeyboardButton.HOME.getLabel())
-//                    .callbackData(StringUtil.serialize(new TicketsViewDTO(page + 1, tickets.size(),"to")))
-//                    .build()));
-//        }
         prepareNavigationButtonFromTickets(page, buttons, fullSize);
         return buttons;
     }
@@ -41,21 +34,20 @@ public class Button {
     public static List<List<InlineKeyboardButton>> prepareButtonsFromArticles(Long chatId, Article article, int page, TicketJ ticket) {
         List<List<InlineKeyboardButton>> buttons = new ArrayList<>();
 
+        buttons.add(List.of(InlineKeyboardButton
+                .builder()
+                .text(ReplyKeyboardButton.COMMENT.getLabel() + " Отправить комментарий")
+                .callbackData(StringUtil.serialize(new SendDataDTO(ticket.getTicketNumber())))
+                .build()));
+
+
         if (article.getAttachments() != null && article.getAttachments().size() > 0) {
             buttons.add(List.of(InlineKeyboardButton
                     .builder()
-                    .text("Выгрузить документы")
+                    .text(ReplyKeyboardButton.DOWNLOAD.getLabel() + " Выгрузить документы")
                     .callbackData(StringUtil.serialize(new DownloadFilesDTO(chatId, ticket.getTicketNumber(), article.getArticleID(), "d")))
                     .build()));
         }
-//        prepareRowButtonFromArticles(articles, buttons);
-//        if (isHome) {
-//            buttons.add(List.of(InlineKeyboardButton
-//                    .builder()
-//                    .text(ReplyKeyboardButton.HOME.getLabel())
-//                    .callbackData(StringUtil.serialize(new TicketsViewDTO(page + 1, tickets.size(),"to")))
-//                    .build()));
-//        }
         prepareNavigationButtonFromArticles(page, buttons, ticket);
         return buttons;
     }
@@ -97,8 +89,8 @@ public class Button {
                 .text(ReplyKeyboardButton.HOME.getLabel() + "Заявок")
                 .callbackData(StringUtil.serialize(new TicketsHomeViewDTO(0)))
                 .build()));
-        if (fullSizeData > 6) {
-            double allPages = getAllPages(fullSizeData);
+        if (fullSizeData > 1) {
+//            double allPages = getAllPages(fullSizeData);
             if (page == 1) {
                 buttons.add(List.of(InlineKeyboardButton
                         .builder()

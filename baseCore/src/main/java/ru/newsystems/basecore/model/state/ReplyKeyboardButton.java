@@ -10,6 +10,8 @@ public enum ReplyKeyboardButton {
     HOME("\uD83C\uDFE0 В список "),
     BACK("◀️ Назад"),
     TO("Вперед ▶️"),
+    DOWNLOAD("\uD83D\uDD87"),
+    COMMENT("\uD83D\uDCDD"),
     NONE("???");
 
     private String label;

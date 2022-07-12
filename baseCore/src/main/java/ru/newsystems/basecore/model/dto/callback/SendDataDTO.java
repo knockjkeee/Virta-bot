@@ -9,14 +9,14 @@ import ru.newsystems.basecore.model.state.SerializableInlineType;
 @Setter
 public class SendDataDTO extends SerializableInlineObject {
   @JsonProperty("m")
-  private String messageId;
+  private String ticketId;
 
   public SendDataDTO() {
     super(SerializableInlineType.SEND_COMMENT);
   }
 
-  public SendDataDTO(String messageId) {
+  public SendDataDTO(String ticketId) {
     this();
-    this.messageId = messageId;
+    this.ticketId = ticketId;
   }
 }

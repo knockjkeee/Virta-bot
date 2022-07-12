@@ -49,12 +49,6 @@ public class ArticlesNavigationViewHandler extends CallbackUpdateHandler<Article
 
         TicketGetDTO ticket = cache.get(update.getCallbackQuery().getMessage().getChatId());
         if (ticket != null) {
-//            bot.execute(SendChatAction
-//                    .builder()
-//                    .chatId(String.valueOf(update.getCallbackQuery().getMessage().getChatId()))
-//                    .action(ActionType.TYPING.toString())
-//                    .build());
-
             Optional<TicketJ> currentTicket = ticket
                     .getTickets()
                     .stream()

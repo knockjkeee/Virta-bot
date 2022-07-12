@@ -23,6 +23,7 @@ import ru.newsystems.basecore.model.dto.callback.SendDataDTO;
 import ru.newsystems.basecore.model.dto.domain.TicketGetDTO;
 import ru.newsystems.basecore.model.dto.domain.TicketSearchDTO;
 import ru.newsystems.basecore.model.state.MessageState;
+import ru.newsystems.basecore.model.state.ReplyKeyboardButton;
 import ru.newsystems.basecore.model.state.UpdateHandlerStage;
 import ru.newsystems.basecore.repo.local.MessageLocalRepo;
 import ru.newsystems.basecore.utils.StringUtil;
@@ -122,11 +123,11 @@ public class MessageUpdateHandler implements UpdateHandler {
 
         List<List<InlineKeyboardButton>> buttons = List.of(List.of(InlineKeyboardButton
                 .builder()
-                .text("Отправить комментарий")
+                .text(ReplyKeyboardButton.COMMENT.getLabel() + " Отправить комментарий")
                 .callbackData(StringUtil.serialize(new SendDataDTO(ticket.getTicketNumber())))
                 .build()), List.of(InlineKeyboardButton
                 .builder()
-                .text("Выгрузить документы")
+                .text(ReplyKeyboardButton.DOWNLOAD.getLabel() + " Выгрузить документы")
                 .callbackData(StringUtil.serialize(new DownloadFilesDTO(update.getMessage().getChatId(), ticket.getTicketNumber(), 0L, "s")))
                 .build()));
 
