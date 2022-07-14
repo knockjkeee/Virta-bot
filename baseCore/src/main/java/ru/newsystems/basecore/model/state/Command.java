@@ -17,12 +17,13 @@ public enum Command {
     create_ticker - Create new ticket
     help - Help at work
     */
-    MY_ID("/my_id", "Get information for me"),
-    MY_TICKET("/my_ticket", "Get my open tickets"),
-    CREATE_TICKET("/create_ticket", "Create new ticket"),
-    HELP("/help", "Help at work"),
-    ABOUT("/about", "About me");
-
+    MY_ID("/my_id", "Информация для регистрации"),
+    MY_TICKET("/my_ticket", "Показать мои открытые заявки"),
+    CREATE_TICKET("/create_ticket", "Создать заявку"),
+    HELP("/help", "Помощь в работе"),
+    ABOUT("/about", "Обо мне"),
+    START("/start", "Init work"),
+;
     private final String name;
     private final String desc;
 
